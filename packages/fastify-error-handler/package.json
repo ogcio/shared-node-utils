@@ -13,6 +13,7 @@
     "description": "",
     "dependencies": {
         "@ogcio/shared-errors": "^0.0.1",
+        "@ogcio/fastify-logging-wrapper": "^0.0.1",
         "fastify": "^4.28.1"
     }
 }
