@@ -5,9 +5,7 @@
     "packages/*"
   ],
   "scripts": {
-    "build": "tsc -b packages/*",
-    "clean": "rm -rf packages/*/dist",
-    "watch": "tsc -b packages/* --watch"
+    "build": "npm run build --ws"
   },
   "keywords": [],
   "author": "",

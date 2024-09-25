@@ -5,8 +5,7 @@
     "types": "dist/index.d.ts",
     "type": "module",
     "scripts": {
-        "build": "tsc -b",
-        "clean": "rm -rf dist"
+        "build": "rm -rf dist tsconfig.prod.tsbuildinfo tsconfig.tsbuildinfo && tsc -p tsconfig.prod.json"
     },
     "keywords": [],
     "author": "",
