@@ -13,6 +13,7 @@
     "license": "ISC",
     "description": "",
     "dependencies": {
-        "@ogcio/shared-errors": "^0.0.1"
+        "@ogcio/shared-errors": "^0.0.1",
+        "fastify": "^4.28.1"
     }
 }
