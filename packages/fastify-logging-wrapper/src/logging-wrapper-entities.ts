@@ -82,8 +82,9 @@ export const toLoggingError = (
   };
 
   if (isHttpError(error)) {
-    const parent = error.parentError
-      ? { parent: parseErrorForLogging(error.parentError) }
+    const parentInput = error.parentError ?? error.parent;
+    const parent = parentInput
+      ? { parent: parseErrorForLogging(parentInput) }
       : {};
 
     return {

@@ -5,7 +5,8 @@
     "types": "dist/index.d.ts",
     "type": "module",
     "scripts": {
-        "build": "rm -rf dist tsconfig.prod.tsbuildinfo tsconfig.tsbuildinfo && tsc -p tsconfig.prod.json"
+        "build": "rm -rf dist tsconfig.prod.tsbuildinfo tsconfig.tsbuildinfo && tsc -p tsconfig.prod.json",
+        "test": "tap --jobs=1 --allow-incomplete-coverage __tests__/**/*.test.ts"
     },
     "keywords": [],
     "author": "",
