@@ -10,5 +10,11 @@
     "keywords": [],
     "author": "",
     "license": "ISC",
-    "description": ""
+    "description": "",
+    "dependencies": {
+        "http-errors": "^2.0.0"
+    },
+    "devDependencies": {
+        "@types/http-errors": "^2.0.4"
+    }
 }

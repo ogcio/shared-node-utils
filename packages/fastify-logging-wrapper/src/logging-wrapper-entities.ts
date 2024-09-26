@@ -1,9 +1,9 @@
 import { FastifyError } from "fastify";
 import {
-  LifeEventsError,
-  isLifeEventsError,
   parseErrorForLogging,
 } from "@ogcio/shared-errors";
+import { HttpError} from "@fastify/sensible";
+import {isHttpError} from "http-errors";
 
 export interface LoggingRequest {
   scheme: string;
@@ -73,7 +73,7 @@ export const REQUEST_ID_LOG_LABEL = "request_id";
 const UNHANDLED_EXCEPTION_CODE = "UNHANDLED_EXCEPTION";
 
 export const toLoggingError = (
-  error: LifeEventsError | FastifyError,
+  error: HttpError | FastifyError,
 ): LoggingError => {
   const output = {
     class: parseErrorClass(error),
@@ -81,7 +81,7 @@ export const toLoggingError = (
     trace: error.stack,
   };
 
-  if (isLifeEventsError(error)) {
+  if (isHttpError(error)) {
     const parent = error.parentError
       ? { parent: parseErrorForLogging(error.parentError) }
       : {};
@@ -101,16 +101,13 @@ export const toLoggingError = (
 };
 
 const parseErrorClass = (
-  error: FastifyError | LifeEventsError,
+  error: FastifyError | HttpError,
 ): LogErrorClasses => {
-  let statusCode = isLifeEventsError(error)
-    ? error.errorCode
-    : error.statusCode;
-  if (!statusCode) {
+  if (!error.statusCode) {
     return LogErrorClasses.UnknownError;
   }
 
-  statusCode = Number(statusCode);
+  const statusCode = Number(error.statusCode);
 
   if (statusCode === 502) {
     return LogErrorClasses.GatewayError;

@@ -1,6 +1,5 @@
-import { isLifeEventsError } from "../errors/life-events-error.js";
 import { isNativeError } from "util/types";
-
+import createError from "http-errors";
 export enum HttpErrorClasses {
   ServerError = "SERVER_ERROR",
   ValidationError = "VALIDATION_ERROR",
@@ -45,15 +44,14 @@ export const REQUEST_ID_HEADER = "x-life-events-request-id";
 export const parseErrorForLogging = (
   e: unknown,
 ): { name: string; message: string; stack?: string } => {
-  if (isLifeEventsError(e) || isNativeError(e) || isFastifyError(e)) {
+  if (createError.isHttpError(e) || isNativeError(e) || isFastifyError(e)) {
     return { message: e.message, stack: e.stack, name: e.name };
   }
-
   return { message: getErrorMessage(e), name: "UNKNOWN_ERROR" };
 };
 
 export const getErrorMessage = (e: unknown): string => {
-  if (isNativeError(e) || isLifeEventsError(e) || isFastifyError(e)) {
+  if (createError.isHttpError(e) || isNativeError(e) || isFastifyError(e)) {
     return e.message;
   }
   switch (typeof e) {

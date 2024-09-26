@@ -5,10 +5,11 @@ import {
   DEFAULT_PATH,
   initializeServer,
 } from "./helpers/fastify-test-helpers.js";
-import { HttpErrorClasses, NotFoundError } from "@ogcio/shared-errors";
+import httpErrors from "http-errors";
+import { HttpErrorClasses } from "@ogcio/shared-errors";
 
 test("Common error is managed as expected", async (t) => {
-  const { server } = initializeServer();
+  const { server } = await initializeServer();
   t.after(() => server.close());
 
   const response = await server.inject({
@@ -28,7 +29,7 @@ test("Common error is managed as expected", async (t) => {
 });
 
 test("Validation error is managed as a Life Events One", async (t) => {
-  const { server } = initializeServer();
+  const { server } = await initializeServer();
   t.after(() => server.close());
 
   const response = await server.inject({
@@ -43,7 +44,7 @@ test("Validation error is managed as a Life Events One", async (t) => {
     code: HttpErrorClasses.ValidationError,
     detail: "error message",
     requestId: "req-1",
-    name: "VALIDATION_ERROR",
+    name: "UnprocessableEntityError",
     validation: [
       {
         fieldName: "the.instance.path",
@@ -55,12 +56,11 @@ test("Validation error is managed as a Life Events One", async (t) => {
         },
       },
     ],
-    process: "/validation?error_message=error+message",
   });
 });
 
 test("If an error with status 200 is raised, it is managed as an unknown one", async (t) => {
-  const { server } = initializeServer();
+  const { server } = await initializeServer();
   t.after(() => server.close());
 
   const response = await server.inject({
@@ -80,7 +80,7 @@ test("If an error with status 200 is raised, it is managed as an unknown one", a
 });
 
 test("404 error is managed as expected", async (t) => {
-  const { server } = initializeServer();
+  const { server } = await initializeServer();
   t.after(() => server.close());
 
   const response = await server.inject({
@@ -92,9 +92,8 @@ test("404 error is managed as expected", async (t) => {
   assert.equal(response?.statusCode, 404);
   assert.deepStrictEqual(response.json(), {
     code: HttpErrorClasses.NotFoundError,
-    detail: "Route not found",
+    detail: "Route not found: /this-path-does-not-exist",
     requestId: "req-1",
-    process: "/this-path-does-not-exist",
-    name: new NotFoundError("TEMP", "TEMP").name,
+    name: new httpErrors[404]("TEMP").name,
   });
 });

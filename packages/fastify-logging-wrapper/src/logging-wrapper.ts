@@ -12,11 +12,11 @@ import {
   toLoggingError,
 } from "./logging-wrapper-entities.js";
 import { LogLevel, PinoLoggerOptions } from "fastify/types/logger.js";
-import { LifeEventsError } from "@ogcio/shared-errors";
+import { HttpError } from "@fastify/sensible";
 
 const loggingContext: LoggingContext = {};
 
-type INPUT_ERROR_TYPES = FastifyError | LifeEventsError;
+type INPUT_ERROR_TYPES = FastifyError | HttpError;
 
 export const getLoggingContext = (params: {
   includeError: boolean;

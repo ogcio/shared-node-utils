@@ -29,12 +29,12 @@ export const getTestingDestinationLogger = (): TestingLoggerDestination => {
   return { loggerDestination, getLoggedRecords };
 };
 
-export const initializeServer = (): {
+export const initializeServer = async (): Promise<{
   server: FastifyInstance;
   loggingDestination: TestingLoggerDestination;
-} => {
+}> => {
   const loggingDestination = getTestingDestinationLogger();
-  const server = buildFastify(loggingDestination.loggerDestination);
+  const server =  await buildFastify(loggingDestination.loggerDestination);
 
   return { server, loggingDestination };
 };

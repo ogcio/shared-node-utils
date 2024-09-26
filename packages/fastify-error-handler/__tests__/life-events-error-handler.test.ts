@@ -4,29 +4,28 @@ import {
   DEFAULT_METHOD,
   initializeServer,
 } from "./helpers/fastify-test-helpers.js";
+import httpErrors from "http-errors";
 import * as sharedErrors from "@ogcio/shared-errors";
 
 const errorsProvider = [
-  { errorType: sharedErrors.AuthenticationError, expectedStatusCode: 401 },
-  { errorType: sharedErrors.AuthorizationError, expectedStatusCode: 403 },
-  { errorType: sharedErrors.LifeEventsError, expectedStatusCode: 500 },
-  { errorType: sharedErrors.NotFoundError, expectedStatusCode: 404 },
-  { errorType: sharedErrors.NotImplementedError, expectedStatusCode: 500 },
-  { errorType: sharedErrors.ServerError, expectedStatusCode: 500 },
-  { errorType: sharedErrors.ThirdPartyError, expectedStatusCode: 502 },
+  { errorType: httpErrors[401], expectedStatusCode: 401 },
+  { errorType: httpErrors[403], expectedStatusCode: 403 },
+  { errorType: httpErrors[500], expectedStatusCode: 500 },
+  { errorType: httpErrors[404], expectedStatusCode: 404 },
+  { errorType: httpErrors[500], expectedStatusCode: 500 },
+  { errorType: httpErrors[502], expectedStatusCode: 502 },
 ];
 
 errorsProvider.forEach((errorProv) =>
   test(`Error is managed in the correct way - ${errorProv.errorType.name}`, async (t) => {
-    const { server } = initializeServer();
+    const { server } = await initializeServer();
     t.after(() => server.close());
 
-    const errorConstructor = sharedErrors[errorProv.errorType.name];
-    const errorInstance = new errorConstructor("MOCK", "message");
+    const errorInstance = new errorProv.errorType("message");
 
     const response = await server.inject({
       method: DEFAULT_METHOD,
-      url: `/life-events/${errorProv.errorType.name}`,
+      url: `/life-events/${errorProv.expectedStatusCode}`,
     });
 
     assert.ok(typeof response !== "undefined");
@@ -36,13 +35,12 @@ errorsProvider.forEach((errorProv) =>
       detail: "Failed Correctly!",
       requestId: "req-1",
       name: errorInstance.name,
-      process: "TESTING",
     });
   })
 );
 
 test(`Custom error is managed based on parameters`, async (t) => {
-  const { server } = initializeServer();
+  const { server } = await initializeServer();
   t.after(() => server.close());
 
   const response = await server.inject({
@@ -57,13 +55,12 @@ test(`Custom error is managed based on parameters`, async (t) => {
     code: sharedErrors.parseHttpErrorClass(503),
     detail: "message",
     requestId: "req-1",
-    name: new sharedErrors.CustomError("MOCK", "mock", 503).name,
-    process: "CUSTOM_PROCESS",
+    name: new httpErrors[503]("MOCK").name,
   });
 });
 
 test(`Validation error is managed as expected`, async (t) => {
-  const { server } = initializeServer();
+  const { server } = await initializeServer();
   t.after(() => server.close());
 
   const response = await server.inject({
@@ -77,8 +74,7 @@ test(`Validation error is managed as expected`, async (t) => {
     code: sharedErrors.parseHttpErrorClass(422),
     detail: "message",
     requestId: "req-1",
-    name: new sharedErrors.ValidationError("MOCK", "mock").name,
-    process: "VALIDATION_PROCESS",
+    name: new httpErrors[422]("MOCK").name,
     validation: [
       { fieldName: "field", message: "error", validationRule: "equal" },
     ],

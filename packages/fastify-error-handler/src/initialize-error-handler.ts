@@ -8,20 +8,17 @@ import { FastifySchemaValidationError } from "fastify/types/schema.js";
 import {
   setLoggingContext,
   getLoggingContextError,
-  LogMessages
+  LogMessages,
 } from "@ogcio/fastify-logging-wrapper";
 import {
   HttpErrorClasses,
-  LifeEventsError,
-  NotFoundError,
-  ValidationError,
   ValidationErrorData,
-  isLifeEventsError,
-  isValidationLifeEventsError,
   parseHttpErrorClass,
 } from "@ogcio/shared-errors";
+import { isHttpError } from "http-errors";
+import { HttpError, httpErrors } from "@fastify/sensible";
 
-export interface HttpError {
+export interface OutputHttpError {
   code: HttpErrorClasses;
   detail: string;
   requestId: string;
@@ -42,7 +39,7 @@ export const setupErrorHandler = (server: FastifyInstance): void => {
       status?: number;
       statusCode?: number;
     },
-    reply: FastifyReply,
+    reply: FastifyReply
   ) => {
     const res = reply.raw;
     let statusCode = res.statusCode;
@@ -63,13 +60,12 @@ export const setupErrorHandler = (server: FastifyInstance): void => {
   };
 
   server.setErrorHandler(function (error, request, reply) {
-    if (isLifeEventsError(error)) {
+    if (isHttpError(error)) {
       manageLifeEventsError(error, request, reply);
       return;
     }
-
     if (error.validation) {
-      const lifeEventsError = toLifeEventsValidationError(error, request);
+      const lifeEventsError = toLifeEventsValidationError(error);
       manageLifeEventsError(lifeEventsError, request, reply);
       return;
     }
@@ -83,7 +79,7 @@ export const setupErrorHandler = (server: FastifyInstance): void => {
 // just without unwanted log entries
 export const initializeNotFoundHandler = (server: FastifyInstance): void => {
   server.setNotFoundHandler((request: FastifyRequest, reply: FastifyReply) => {
-    const error = new NotFoundError(request.url, "Route not found");
+    const error = httpErrors.notFound(`Route not found: ${request.url}`);
     setLoggingContext({
       error,
     });
@@ -94,9 +90,10 @@ export const initializeNotFoundHandler = (server: FastifyInstance): void => {
 };
 
 const getValidationFromFastifyError = (
-  validationInput: FastifySchemaValidationError[],
-): ValidationErrorData[] => {
+  validationInput: FastifySchemaValidationError[]
+): { validation: ValidationErrorData[] } => {
   const output: ValidationErrorData[] = [];
+
   for (const input of validationInput) {
     const key =
       input.params?.missingProperty ?? input.instancePath.split("/").pop();
@@ -119,68 +116,65 @@ const getValidationFromFastifyError = (
     });
   }
 
-  return output;
+  return { validation: output };
 };
 
 const getResponseFromFastifyError = (
   error: FastifyError,
-  request: FastifyRequest,
-): HttpError => {
-  const output: HttpError = {
+  request: FastifyRequest
+): OutputHttpError => {
+  const output: OutputHttpError = {
     code: parseHttpErrorClass(error.statusCode),
     detail: error.message,
     requestId: request.id,
     name: error.name,
   };
-
   if (error.validation && error.validation.length > 0) {
-    output.validation = getValidationFromFastifyError(error.validation);
+    output.validation = getValidationFromFastifyError(
+      error.validation
+    ).validation;
   }
 
   return output;
 };
 
 const manageLifeEventsError = (
-  error: LifeEventsError,
+  error: HttpError,
   request: FastifyRequest,
-  reply: FastifyReply,
+  reply: FastifyReply
 ): void => {
-  reply.raw.statusCode = error.errorCode;
-  reply.statusCode = error.errorCode;
-
-  const errorResponse: HttpError = {
-    code: parseHttpErrorClass(error.errorCode),
+  reply.raw.statusCode = error.statusCode;
+  reply.statusCode = error.statusCode;
+  const errorResponse: OutputHttpError = {
+    code: parseHttpErrorClass(error.statusCode),
     detail: error.message,
     requestId: request.id,
     name: error.name,
     process: error.errorProcess,
   };
-
-  if (
-    isValidationLifeEventsError(error) &&
-    error.validationErrors &&
-    Object.keys(error.validationErrors).length > 0
-  ) {
-    errorResponse.validation = error.validationErrors;
+  let validationErrors =
+    error.validationErrors && error.validationErrors.length > 0
+      ? error.validationErrors
+      : undefined;
+  if (!validationErrors && error.validation && error.validation.length > 0) {
+    validationErrors = error.validation;
   }
 
-  reply.status(error.errorCode).send(errorResponse);
+  if (validationErrors) {
+    errorResponse.validation = validationErrors;
+  }
+
+  reply.status(error.statusCode).send(errorResponse);
 };
 
-const toLifeEventsValidationError = (
-  error: FastifyError,
-  request: FastifyRequest,
-): ValidationError => {
+const toLifeEventsValidationError = (error: FastifyError): HttpError => {
   if (!error.validation) {
-    throw new LifeEventsError(
-      "ERROR_HANDLER_SETUP",
-      "This is not a validation error",
-    );
+    throw httpErrors.createError(500, "This is not a validation error");
   }
 
-  return new ValidationError(
-    request.url,
+  return httpErrors.createError(
+    422,
     error.message,
-    getValidationFromFastifyError(error.validation),
+    getValidationFromFastifyError(error.validation)
   );
 };
