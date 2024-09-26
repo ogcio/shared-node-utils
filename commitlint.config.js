@@ -1,9 +1,15 @@
 module.exports = {
   extends: ["@commitlint/config-conventional"],
-  "scope-enum": [
-    "core",
-    "shared-errors",
-    "fastify-error-handler",
-    "fastify-logging-wrapper",
-  ],
+  rules: {
+    "scope-enum": [
+      2,
+      "always",
+      [
+        "core",
+        "shared-errors",
+        "fastify-error-handler",
+        "fastify-logging-wrapper",
+      ],
+    ],
+  },
 };
