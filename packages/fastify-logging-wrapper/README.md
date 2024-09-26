@@ -1,11 +1,14 @@
-# Logging Wrapper
+# Fastify Logging Wrapper
 
 This logging wrapper goal is to standardize the records written by our Fastify services.
 
 ## How to
 
 To use this package three steps are needed:
-- add `"logging-wrapper": "*",` to your dependencies
+- install the package with
+```
+npm i @ogcio/fastify-logging-wrapper
+```
 
 - use the `getLoggingConfiguration()` method to get the configuration for the `fastify` server
 ```
@@ -20,10 +23,6 @@ initializeLoggingHooks(server);
 ```
 
 That's it! Just log as you usually do!
-
-## Docker
-
-Remember to copy the package to the container in your Dockerfile!
 
 ## Default records
 
