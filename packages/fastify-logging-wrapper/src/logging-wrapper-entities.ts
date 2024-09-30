@@ -11,6 +11,7 @@ export interface LoggingRequest {
   path: string | undefined;
   hostname: string;
   query_params: unknown;
+  port: number;
   [key: string]: unknown;
 }
 

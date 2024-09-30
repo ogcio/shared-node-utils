@@ -66,6 +66,7 @@ const parseLoggingRequest = (req: FastifyRequest): LoggingRequest => ({
   path: getPathWithoutParams(req),
   hostname: req.hostname,
   query_params: req.query,
+  port: req.port,
 });
 
 export const parseFullLoggingRequest = (
