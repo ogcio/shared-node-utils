@@ -1,2 +1,3 @@
+npm run build
 npm run test -w=@ogcio/fastify-error-handler
 npm run test -w=@ogcio/fastify-logging-wrapper
