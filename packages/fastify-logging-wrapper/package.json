@@ -9,9 +9,12 @@
         "test": "tap --jobs=1 --allow-incomplete-coverage __tests__/**/*.test.ts"
     },
     "keywords": [],
-    "author": "",
+    "author": {
+        "name": "Samuele Salvatico",
+        "email": "samuele.salvatico@nearform.com"
+    },
     "license": "ISC",
-    "description": "",
+    "description": "Enable standardized log entries for each request in fastify",
     "dependencies": {
         "@fastify/error": "^4.0.0",
         "@fastify/sensible": "^5.6.0",

@@ -11,9 +11,12 @@
     "prepare": "husky"
   },
   "keywords": [],
-  "author": "",
+  "author": {
+    "name": "Samuele Salvatico",
+    "email": "samuele.salvatico@nearform.com"
+  },
   "license": "ISC",
-  "description": "",
+  "description": "Group of Node.js utils projects used in the OGCIO projects",
   "devDependencies": {
     "@commitlint/config-conventional": "^19.5.0",
     "@types/node": "^22.7.0",
