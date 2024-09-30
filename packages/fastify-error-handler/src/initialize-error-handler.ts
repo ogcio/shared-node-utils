@@ -61,12 +61,12 @@ export const setupErrorHandler = (server: FastifyInstance): void => {
 
   server.setErrorHandler(function (error, request, reply) {
     if (isHttpError(error)) {
-      manageLifeEventsError(error, request, reply);
+      manageHttpError(error, request, reply);
       return;
     }
     if (error.validation) {
-      const lifeEventsError = toLifeEventsValidationError(error);
-      manageLifeEventsError(lifeEventsError, request, reply);
+      const httpError = toOutputHttpValidationError(error);
+      manageHttpError(httpError, request, reply);
       return;
     }
 
@@ -85,7 +85,7 @@ export const initializeNotFoundHandler = (server: FastifyInstance): void => {
     });
 
     request.log.error({ error: getLoggingContextError() }, LogMessages.Error);
-    manageLifeEventsError(error, request, reply);
+    manageHttpError(error, request, reply);
   });
 };
 
@@ -138,7 +138,7 @@ const getResponseFromFastifyError = (
   return output;
 };
 
-const manageLifeEventsError = (
+const manageHttpError = (
   error: HttpError,
   request: FastifyRequest,
   reply: FastifyReply
@@ -167,7 +167,7 @@ const manageLifeEventsError = (
   reply.status(error.statusCode).send(errorResponse);
 };
 
-const toLifeEventsValidationError = (error: FastifyError): HttpError => {
+const toOutputHttpValidationError = (error: FastifyError): HttpError => {
   if (!error.validation) {
     throw httpErrors.createError(500, "This is not a validation error");
   }
