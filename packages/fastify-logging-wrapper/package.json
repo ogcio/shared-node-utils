@@ -1,6 +1,6 @@
 {
     "name": "@ogcio/fastify-logging-wrapper",
-    "version": "4.0.0",
+    "version": "5.0.0",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
     "type": "module",
@@ -17,8 +17,8 @@
     "description": "Enable standardized log entries for each request in fastify",
     "dependencies": {
         "@fastify/error": "^4.0.0",
-        "@fastify/sensible": "^5.6.0",
-        "fastify": "^4.28.1",
+        "@fastify/sensible": "^6.0.1",
+        "fastify": "^5.0.0",
         "hyperid": "^3.3.0"
     },
     "devDependencies": {
@@ -28,5 +28,6 @@
         "type": "git",
         "url": "git+https://github.com/ogcio/shared-node-utils.git",
         "directory": "packages/fastify-logging-wrapper"
-    }
+    },
+    "homepage": "https://github.com/ogcio/shared-node-utils/tree/main/packages/fastify-logging-wrapper#readme"
 }

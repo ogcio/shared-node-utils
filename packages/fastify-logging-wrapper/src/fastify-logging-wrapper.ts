@@ -51,7 +51,7 @@ export const initializeLoggingHooks = (server: FastifyInstance): void => {
 export const getLoggingConfiguration = (
   loggerDestination?: DestinationStream,
 ): FastifyServerOptions => ({
-  logger: pino(getLoggerConfiguration(), loggerDestination),
+  loggerInstance: pino(getLoggerConfiguration(), loggerDestination),
   disableRequestLogging: true,
   genReqId: () => hyperidInstance(),
   requestIdLogLabel: REQUEST_ID_LOG_LABEL,

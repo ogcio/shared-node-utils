@@ -7,7 +7,7 @@ import httpErrors from "http-errors";
 export const buildFastify = async (
   loggerDestination?: DestinationStream
 ): Promise<FastifyInstance> => {
-  const server = fastify({ logger: pino({}, loggerDestination) });
+  const server = fastify({ loggerInstance: pino({}, loggerDestination) });
   initializeErrorHandler(server as unknown as FastifyInstance);
   await server.register(fastifySensible);
   server.get("/error", async (request, _reply) => {
