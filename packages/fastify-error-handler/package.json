@@ -18,7 +18,6 @@
     "dependencies": {
         "@fastify/sensible": "^5.6.0",
         "@ogcio/fastify-logging-wrapper": "^4.0.0",
-        "@ogcio/shared-errors": "^1.0.0",
         "fastify": "^4.28.1"
     },
     "devDependencies": {
