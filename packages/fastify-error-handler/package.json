@@ -1,6 +1,6 @@
 {
     "name": "@ogcio/fastify-error-handler",
-    "version": "0.0.1",
+    "version": "4.0.0",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
     "type": "module",
@@ -17,11 +17,15 @@
     "description": "Normalize the error handling of errors with related logs",
     "dependencies": {
         "@fastify/sensible": "^5.6.0",
-        "@ogcio/fastify-logging-wrapper": "^0.0.1",
-        "@ogcio/shared-errors": "^0.0.1",
+        "@ogcio/fastify-logging-wrapper": "^4.0.0",
         "fastify": "^4.28.1"
     },
     "devDependencies": {
         "@types/http-errors": "^2.0.4"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/ogcio/shared-node-utils.git",
+        "directory": "packages/fastify-error-handler"
     }
 }
