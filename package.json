@@ -7,8 +7,8 @@
   ],
   "scripts": {
     "build": "npm run build --ws",
-    "publish": "lerna publish",
-    "version": "lerna version",
+    "publish": "lerna publish --no-private",
+    "version": "lerna version --no-private",
     "prepare": "husky"
   },
   "keywords": [],
