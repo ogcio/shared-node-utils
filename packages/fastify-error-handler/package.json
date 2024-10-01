@@ -1,6 +1,6 @@
 {
     "name": "@ogcio/fastify-error-handler",
-    "version": "0.0.1",
+    "version": "4.0.0",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
     "type": "module",
