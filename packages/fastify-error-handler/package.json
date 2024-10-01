@@ -1,6 +1,6 @@
 {
     "name": "@ogcio/fastify-error-handler",
-    "version": "5.0.0",
+    "version": "5.0.1",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
     "type": "module",
@@ -16,7 +16,8 @@
     "license": "ISC",
     "description": "Normalize the error handling of errors with related logs",
     "dependencies": {
-        "@ogcio/fastify-logging-wrapper": "^5.0.0",
+        "@ogcio/fastify-logging-wrapper": "^5.0.1",
+        "@ogcio/shared-errors": "^1.0.0",
         "fastify": "^5.0.0"
     },
     "devDependencies": {
