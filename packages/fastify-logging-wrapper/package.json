@@ -18,6 +18,7 @@
     "dependencies": {
         "@fastify/error": "^4.0.0",
         "@fastify/sensible": "^5.6.0",
+        "@ogcio/shared-errors": "^1.0.0",
         "fastify": "^4.28.1",
         "hyperid": "^3.3.0"
     },
