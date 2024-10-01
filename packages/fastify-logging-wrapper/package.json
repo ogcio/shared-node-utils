@@ -28,5 +28,6 @@
         "type": "git",
         "url": "git+https://github.com/ogcio/shared-node-utils.git",
         "directory": "packages/fastify-logging-wrapper"
-    }
+    },
+    "homepage": "https://github.com/ogcio/shared-node-utils/tree/main/packages/fastify-logging-wrapper#readme"
 }

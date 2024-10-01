@@ -26,5 +26,6 @@
         "type": "git",
         "url": "git+https://github.com/ogcio/shared-node-utils.git",
         "directory": "packages/fastify-error-handler"
-    }
+    },
+    "homepage": "https://github.com/ogcio/shared-node-utils/tree/main/packages/fastify-error-handler#readme"
 }
