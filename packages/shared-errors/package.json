@@ -5,11 +5,16 @@
     "types": "dist/index.d.ts",
     "type": "module",
     "scripts": {
-        "build": "tsc -b",
-        "clean": "rm -rf dist"
+        "build": "rm -rf dist tsconfig.prod.tsbuildinfo tsconfig.tsbuildinfo && tsc -p tsconfig.prod.json"
     },
     "keywords": [],
     "author": "",
     "license": "ISC",
-    "description": ""
+    "description": "",
+    "dependencies": {
+        "http-errors": "^2.0.0"
+    },
+    "devDependencies": {
+        "@types/http-errors": "^2.0.4"
+    }
 }

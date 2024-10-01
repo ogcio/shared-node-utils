@@ -1,8 +1,0 @@
-{
-    "files": [],
-    "references": [
-      { "path": "./packages/fastify-error-handler" },
-      { "path": "./packages/fastify-logging-wrapper" },
-      { "path": "./packages/shared-errors" }
-    ]
-  }

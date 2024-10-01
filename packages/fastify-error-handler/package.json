@@ -5,14 +5,23 @@
     "types": "dist/index.d.ts",
     "type": "module",
     "scripts": {
-        "build": "tsc -b",
-        "clean": "rm -rf dist"
+        "build": "rm -rf dist tsconfig.prod.tsbuildinfo tsconfig.tsbuildinfo && tsc -p tsconfig.prod.json",
+        "test": "tap --jobs=1 --allow-incomplete-coverage __tests__/**/*.test.ts"
     },
     "keywords": [],
-    "author": "",
+    "author": {
+        "name": "Samuele Salvatico",
+        "email": "samuele.salvatico@nearform.com"
+    },
     "license": "ISC",
-    "description": "",
+    "description": "Normalize the error handling of errors with related logs",
     "dependencies": {
-        "@ogcio/shared-errors": "^0.0.1"
+        "@fastify/sensible": "^5.6.0",
+        "@ogcio/fastify-logging-wrapper": "^0.0.1",
+        "@ogcio/shared-errors": "^0.0.1",
+        "fastify": "^4.28.1"
+    },
+    "devDependencies": {
+        "@types/http-errors": "^2.0.4"
     }
 }
