@@ -22,5 +22,10 @@
     },
     "devDependencies": {
         "@types/http-errors": "^2.0.4"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/ogcio/shared-node-utils.git",
+        "directory": "packages/fastify-error-handler"
     }
 }
