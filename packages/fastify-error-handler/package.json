@@ -17,8 +17,8 @@
     "description": "Normalize the error handling of errors with related logs",
     "dependencies": {
         "@fastify/sensible": "^5.6.0",
-        "@ogcio/fastify-logging-wrapper": "^0.0.1",
-        "@ogcio/shared-errors": "^0.0.1",
+        "@ogcio/fastify-logging-wrapper": "^4.0.0",
+        "@ogcio/shared-errors": "^1.0.0",
         "fastify": "^4.28.1"
     },
     "devDependencies": {
