@@ -9,7 +9,9 @@ import { httpErrors } from "@fastify/sensible";
 
 export const buildFastify = (loggerDestination?: DestinationStream) => {
   const server = Fastify({
-    ...getLoggingConfiguration(loggerDestination),
+    ...getLoggingConfiguration({
+      loggerDestination: loggerDestination
+    }),
   });
 
   initializeLoggingHooks(server);
