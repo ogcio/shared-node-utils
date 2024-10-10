@@ -1,5 +1,5 @@
-import test from 'node:test';
-import assert from 'node:assert/strict';
+import test from "node:test";
+import assert from "node:assert/strict";
 import { LogErrorClasses } from "../src/logging-wrapper-entities.js";
 import {
   DEFAULT_METHOD,
@@ -11,7 +11,10 @@ import {
   parseLogEntry,
   runErrorTest,
 } from "./helpers/fastify-test-helpers.js";
-import { httpErrors } from '@fastify/sensible';
+import { httpErrors } from "@fastify/sensible";
+import { getLoggingConfiguration } from "../src/fastify-logging-wrapper.js";
+import { FastifyServerOptions } from "fastify";
+import { DestinationStream } from "pino";
 
 test("Error data are correctly set", async (t) => {
   const { server, loggingDestination } = initializeServer();
@@ -124,4 +127,47 @@ test("Life events error logs expected values", async (t) => {
     errorMessage: "mock",
     errorCode: mockErrorInstance.name,
   });
+});
+
+test("getLoggingConfiguration without customConfig, should use default pino logger", () => {
+  const fastifyConfig: FastifyServerOptions = getLoggingConfiguration();
+
+  assert.ok(fastifyConfig);
+  assert.ok(fastifyConfig.logger);
+  // expect undefined, because we're using the default fastify pino instance
+  assert.equal(fastifyConfig.loggerInstance, undefined);
+});
+
+test("getLoggingConfiguration with customConfig, should create new logger instance", () => {
+  class TestDestinationStream implements DestinationStream {
+    write(msg: string): void {
+      throw new Error("Test example!");
+    }
+  }
+
+  const fastifyConfig: FastifyServerOptions = getLoggingConfiguration({
+    pinoOptions: { messageKey: "TEST_NAME" },
+    loggerDestination: new TestDestinationStream(),
+  });
+
+  assert.ok(fastifyConfig);
+  // expect undefined, because we're using a new custom logger instance
+  assert.equal(fastifyConfig.logger, undefined);
+  assert.ok(fastifyConfig.loggerInstance);
+
+  const symMessageKey = Reflect.ownKeys(fastifyConfig.loggerInstance).find(
+    (s) => {
+      return String(s) === "Symbol(pino.messageKey)";
+    }
+  );
+
+  assert.equal(fastifyConfig.loggerInstance[symMessageKey!], "TEST_NAME");
+
+  const symStream = Reflect.ownKeys(fastifyConfig.loggerInstance).find((s) => {
+    return String(s) === "Symbol(pino.stream)";
+  });
+
+  assert.ok(
+    fastifyConfig.loggerInstance[symStream!] instanceof TestDestinationStream
+  );
 });
