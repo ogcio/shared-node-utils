@@ -23,7 +23,7 @@ export const initializeLoggingHooks = (server: FastifyInstance): void => {
     setLoggingContext({ request });
     request.log.info(
       { request: parseFullLoggingRequest(request) },
-      LogMessages.NewRequest,
+      LogMessages.NewRequest
     );
     done();
   });
@@ -34,7 +34,7 @@ export const initializeLoggingHooks = (server: FastifyInstance): void => {
     // Include error in API Track if exists
     reply.log.info(
       { error: getPartialLoggingContextError() },
-      LogMessages.ApiTrack,
+      LogMessages.ApiTrack
     );
     resetLoggingContext();
     done();
@@ -49,18 +49,21 @@ export const initializeLoggingHooks = (server: FastifyInstance): void => {
   });
 };
 
-export const getLoggingConfiguration = (
-  customConfig?: {pinoOptions?: PinoLoggerOptions, loggerDestination?: DestinationStream}
-): FastifyServerOptions => {
-
-  if (customConfig) 
+export const getLoggingConfiguration = (customConfig?: {
+  pinoOptions?: PinoLoggerOptions;
+  loggerDestination?: DestinationStream;
+}): FastifyServerOptions => {
+  if (customConfig)
     return {
-      loggerInstance: pino({...getLoggerConfiguration(), ...(customConfig?.pinoOptions ?? {}),}, customConfig?.loggerDestination),
+      loggerInstance: pino(
+        { ...getLoggerConfiguration(), ...(customConfig?.pinoOptions ?? {}) },
+        customConfig?.loggerDestination
+      ),
       disableRequestLogging: true,
       genReqId: () => hyperidInstance(),
       requestIdLogLabel: REQUEST_ID_LOG_LABEL,
       requestIdHeader: REQUEST_ID_HEADER,
-  }
+    };
 
   return {
     logger: getLoggerConfiguration(),
@@ -68,6 +71,5 @@ export const getLoggingConfiguration = (
     genReqId: () => hyperidInstance(),
     requestIdLogLabel: REQUEST_ID_LOG_LABEL,
     requestIdHeader: REQUEST_ID_HEADER,
-  }
+  };
 };
-;
