@@ -14,6 +14,7 @@ import {
 } from "./logging-wrapper.js";
 import { pino, DestinationStream } from "pino";
 import { REQUEST_ID_HEADER } from "@ogcio/shared-errors";
+import { PinoLoggerOptions } from "fastify/types/logger.js";
 
 const hyperidInstance = hyperid({ fixedLength: true, urlSafe: true });
 
@@ -22,7 +23,7 @@ export const initializeLoggingHooks = (server: FastifyInstance): void => {
     setLoggingContext({ request });
     request.log.info(
       { request: parseFullLoggingRequest(request) },
-      LogMessages.NewRequest,
+      LogMessages.NewRequest
     );
     done();
   });
@@ -33,7 +34,7 @@ export const initializeLoggingHooks = (server: FastifyInstance): void => {
     // Include error in API Track if exists
     reply.log.info(
       { error: getPartialLoggingContextError() },
-      LogMessages.ApiTrack,
+      LogMessages.ApiTrack
     );
     resetLoggingContext();
     done();
@@ -48,12 +49,27 @@ export const initializeLoggingHooks = (server: FastifyInstance): void => {
   });
 };
 
-export const getLoggingConfiguration = (
-  loggerDestination?: DestinationStream,
-): FastifyServerOptions => ({
-  loggerInstance: pino(getLoggerConfiguration(), loggerDestination),
-  disableRequestLogging: true,
-  genReqId: () => hyperidInstance(),
-  requestIdLogLabel: REQUEST_ID_LOG_LABEL,
-  requestIdHeader: REQUEST_ID_HEADER,
-});
+export const getLoggingConfiguration = (customConfig?: {
+  pinoOptions?: PinoLoggerOptions;
+  loggerDestination?: DestinationStream;
+}): FastifyServerOptions => {
+  if (customConfig)
+    return {
+      loggerInstance: pino(
+        { ...getLoggerConfiguration(), ...(customConfig?.pinoOptions ?? {}) },
+        customConfig?.loggerDestination
+      ),
+      disableRequestLogging: true,
+      genReqId: () => hyperidInstance(),
+      requestIdLogLabel: REQUEST_ID_LOG_LABEL,
+      requestIdHeader: REQUEST_ID_HEADER,
+    };
+
+  return {
+    logger: getLoggerConfiguration(),
+    disableRequestLogging: true,
+    genReqId: () => hyperidInstance(),
+    requestIdLogLabel: REQUEST_ID_LOG_LABEL,
+    requestIdHeader: REQUEST_ID_HEADER,
+  };
+};
