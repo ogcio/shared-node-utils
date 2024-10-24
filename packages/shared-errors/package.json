@@ -16,6 +16,5 @@
     },
     "devDependencies": {
         "@types/http-errors": "^2.0.4"
-    },
-    "private": "true"
+    }
 }
