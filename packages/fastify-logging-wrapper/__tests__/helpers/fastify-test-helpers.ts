@@ -1,14 +1,14 @@
-import { FastifyInstance } from "fastify";
-import { buildFastify } from "./build-fastify.js";
+import assert from "node:assert/strict";
+import type { FastifyInstance } from "fastify";
 import {
-  TestingLoggerDestination,
-  getTestingDestinationLogger,
-} from "./build-logger.js";
-import {
-  LogErrorClasses,
+  type LogErrorClasses,
   LogMessages,
 } from "../../src/logging-wrapper-entities.js";
-import assert from "node:assert/strict";
+import { buildFastify } from "./build-fastify.js";
+import {
+  type TestingLoggerDestination,
+  getTestingDestinationLogger,
+} from "./build-logger.js";
 
 export const DEFAULT_HOSTNAME = "localhost";
 export const DEFAULT_PORT = 80;
@@ -33,7 +33,7 @@ export const initializeServer = (): {
   return { server, loggingDestination };
 };
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+// biome-ignore lint/suspicious/noExplicitAny: <explanation>
 export const parseLogEntry = (logEntry: string): { [x: string]: any } =>
   JSON.parse(logEntry);
 

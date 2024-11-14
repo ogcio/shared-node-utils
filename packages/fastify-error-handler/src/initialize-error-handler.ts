@@ -1,22 +1,22 @@
-import {
+import type {
   FastifyError,
   FastifyRequest,
   FastifyInstance,
   FastifyReply,
 } from "fastify";
-import { FastifySchemaValidationError } from "fastify/types/schema.js";
+import type { FastifySchemaValidationError } from "fastify/types/schema.js";
 import {
   setLoggingContext,
   getLoggingContextError,
   LogMessages,
 } from "@ogcio/fastify-logging-wrapper";
 import {
-  HttpErrorClasses,
-  ValidationErrorData,
+  type HttpErrorClasses,
+  type ValidationErrorData,
   parseHttpErrorClass,
 } from "@ogcio/shared-errors";
 import { isHttpError } from "http-errors";
-import { HttpError, httpErrors } from "@fastify/sensible";
+import { type HttpError, httpErrors } from "@fastify/sensible";
 
 export interface OutputHttpError {
   code: HttpErrorClasses;
@@ -59,7 +59,7 @@ export const setupErrorHandler = (server: FastifyInstance): void => {
     reply.statusCode = res.statusCode;
   };
 
-  server.setErrorHandler(function (error, request, reply) {
+  server.setErrorHandler((error, request, reply) => {
     if (isHttpError(error)) {
       manageHttpError(error, request, reply);
       return;

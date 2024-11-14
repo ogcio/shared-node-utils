@@ -1,4 +1,4 @@
-import { FastifyServerOptions, FastifyInstance } from "fastify";
+import type { FastifyServerOptions, FastifyInstance } from "fastify";
 import hyperid from "hyperid";
 import {
   LogMessages,
@@ -12,9 +12,9 @@ import {
   resetLoggingContext,
   setLoggingContext,
 } from "./logging-wrapper.js";
-import { pino, DestinationStream } from "pino";
+import { pino, type DestinationStream } from "pino";
 import { REQUEST_ID_HEADER } from "@ogcio/shared-errors";
-import { PinoLoggerOptions } from "fastify/types/logger.js";
+import type { PinoLoggerOptions } from "fastify/types/logger.js";
 
 const hyperidInstance = hyperid({ fixedLength: true, urlSafe: true });
 

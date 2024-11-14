@@ -1,6 +1,6 @@
-import { FastifyError } from "fastify";
+import type { FastifyError } from "fastify";
 import { parseErrorForLogging } from "@ogcio/shared-errors";
-import { HttpError } from "@fastify/sensible";
+import type { HttpError } from "@fastify/sensible";
 import { isHttpError } from "http-errors";
 
 export interface LoggingRequest {
