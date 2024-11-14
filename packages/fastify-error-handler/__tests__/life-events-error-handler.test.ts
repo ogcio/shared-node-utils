@@ -1,7 +1,6 @@
-import assert from "node:assert/strict";
-import test from "node:test";
 import * as sharedErrors from "@ogcio/shared-errors";
 import httpErrors from "http-errors";
+import { assert, afterEach, describe, it } from "vitest";
 import {
   DEFAULT_METHOD,
   initializeServer,
@@ -16,67 +15,68 @@ const errorsProvider = [
   { errorType: httpErrors[502], expectedStatusCode: 502 },
 ];
 
-for (const errorProv of errorsProvider) {
-  test(`Error is managed in the correct way - ${errorProv.errorType.name}`, async (t) => {
+describe("Error management", () => {
+  afterEach(async () => {
     const { server } = await initializeServer();
-    t.after(() => server.close());
+    await server.close();
+  });
 
-    const errorInstance = new errorProv.errorType("message");
+  for (const errorProv of errorsProvider) {
+    it(`manages ${errorProv.errorType.name} correctly`, async () => {
+      const { server } = await initializeServer();
+      const errorInstance = new errorProv.errorType("message");
 
+      const response = await server.inject({
+        method: DEFAULT_METHOD,
+        url: `/life-events/${errorProv.expectedStatusCode}`,
+      });
+
+      assert.ok(typeof response !== "undefined");
+      assert.equal(response?.statusCode, errorProv.expectedStatusCode);
+      assert.deepEqual(response.json(), {
+        code: sharedErrors.parseHttpErrorClass(errorProv.expectedStatusCode),
+        detail: "Failed Correctly!",
+        requestId: "req-1",
+        name: errorInstance.name,
+      });
+    });
+  }
+
+  it("manages custom errors based on parameters", async () => {
+    const { server } = await initializeServer();
     const response = await server.inject({
       method: DEFAULT_METHOD,
-      url: `/life-events/${errorProv.expectedStatusCode}`,
+      url: "/life-events/custom",
+      query: { status_code: "503" },
     });
 
     assert.ok(typeof response !== "undefined");
-    assert.equal(response?.statusCode, errorProv.expectedStatusCode);
-    assert.deepStrictEqual(response.json(), {
-      code: sharedErrors.parseHttpErrorClass(errorProv.expectedStatusCode),
-      detail: "Failed Correctly!",
+    assert.equal(response?.statusCode, 503);
+    assert.deepEqual(response.json(), {
+      code: sharedErrors.parseHttpErrorClass(503),
+      detail: "message",
       requestId: "req-1",
-      name: errorInstance.name,
+      name: new httpErrors[503]("MOCK").name,
     });
   });
-}
 
-test("Custom error is managed based on parameters", async (t) => {
-  const { server } = await initializeServer();
-  t.after(() => server.close());
+  it("manages validation errors as expected", async () => {
+    const { server } = await initializeServer();
+    const response = await server.inject({
+      method: DEFAULT_METHOD,
+      url: "/life-events/validation",
+    });
 
-  const response = await server.inject({
-    method: DEFAULT_METHOD,
-    url: "/life-events/custom",
-    query: { status_code: "503" },
-  });
-
-  assert.ok(typeof response !== "undefined");
-  assert.equal(response?.statusCode, 503);
-  assert.deepStrictEqual(response.json(), {
-    code: sharedErrors.parseHttpErrorClass(503),
-    detail: "message",
-    requestId: "req-1",
-    name: new httpErrors[503]("MOCK").name,
-  });
-});
-
-test("Validation error is managed as expected", async (t) => {
-  const { server } = await initializeServer();
-  t.after(() => server.close());
-
-  const response = await server.inject({
-    method: DEFAULT_METHOD,
-    url: "/life-events/validation",
-  });
-
-  assert.ok(typeof response !== "undefined");
-  assert.equal(response?.statusCode, 422);
-  assert.deepStrictEqual(response.json(), {
-    code: sharedErrors.parseHttpErrorClass(422),
-    detail: "message",
-    requestId: "req-1",
-    name: new httpErrors[422]("MOCK").name,
-    validation: [
-      { fieldName: "field", message: "error", validationRule: "equal" },
-    ],
+    assert.ok(typeof response !== "undefined");
+    assert.equal(response?.statusCode, 422);
+    assert.deepEqual(response.json(), {
+      code: sharedErrors.parseHttpErrorClass(422),
+      detail: "message",
+      requestId: "req-1",
+      name: new httpErrors[422]("MOCK").name,
+      validation: [
+        { fieldName: "field", message: "error", validationRule: "equal" },
+      ],
+    });
   });
 });
