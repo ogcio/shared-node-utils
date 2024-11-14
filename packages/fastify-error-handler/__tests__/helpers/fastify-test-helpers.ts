@@ -39,6 +39,6 @@ export const initializeServer = async (): Promise<{
   return { server, loggingDestination };
 };
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+// biome-ignore lint/suspicious/noExplicitAny: <explanation>
 export const parseLogEntry = (logEntry: string): { [x: string]: any } =>
   JSON.parse(logEntry);

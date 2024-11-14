@@ -1,11 +1,11 @@
+import { createError } from "@fastify/error";
+import { httpErrors } from "@fastify/sensible";
 import Fastify from "fastify";
+import type { DestinationStream } from "pino";
 import {
   getLoggingConfiguration,
   initializeLoggingHooks,
 } from "../../src/fastify-logging-wrapper.js";
-import type { DestinationStream } from "pino";
-import { createError } from "@fastify/error";
-import { httpErrors } from "@fastify/sensible";
 
 export const buildFastify = (loggerDestination?: DestinationStream) => {
   const server = Fastify({
@@ -20,10 +20,10 @@ export const buildFastify = (loggerDestination?: DestinationStream) => {
 
   server.get("/error", async (request, _reply) => {
     const parsed = request.query as { [x: string]: unknown };
-    const requestedStatusCode = Number(parsed["status_code"] ?? "500");
-    const requestedMessage = String(parsed["error_message"] ?? "WHOOOPS");
+    const requestedStatusCode = Number(parsed.status_code ?? "500");
+    const requestedMessage = String(parsed.error_message ?? "WHOOOPS");
 
-    if (!parsed["status_code"]) {
+    if (!parsed.status_code) {
       throw new Error(requestedMessage);
     }
 

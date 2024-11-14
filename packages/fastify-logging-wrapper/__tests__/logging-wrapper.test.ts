@@ -122,7 +122,8 @@ test("Basic format is the expected one", async (_t) => {
     parsed.timestamp > Date.now() - 2000,
     "the timestamp must be newer than 2 seconds ago",
   );
-  parsed.timestamp = undefined;
+  // biome-ignore lint/performance/noDelete: Would change behaviour of the test
+  delete parsed.timestamp;
   assert.deepStrictEqual(parsed, {
     level: 20,
     level_name: "DEBUG",
@@ -139,15 +140,19 @@ test("Fields are redacted as expected", async (_t) => {
 
   const loggedRecords = loggedRecordsMethod();
   const parsed = JSON.parse(loggedRecords[0]);
+  // biome-ignore lint/performance/noDelete: Would change behaviour of the test
   delete parsed.hostname;
+  // biome-ignore lint/performance/noDelete: Would change behaviour of the test
   delete parsed.level;
+  // biome-ignore lint/performance/noDelete: Would change behaviour of the test
   delete parsed.level_name;
+  // biome-ignore lint/performance/noDelete: Would change behaviour of the test
   delete parsed.timestamp;
 
   assert.deepStrictEqual(parsed, toRedactFields.expected_output);
 });
 
-methodsDataProvider.forEach((methodDataProvider) =>
+for (const methodDataProvider of methodsDataProvider) {
   test(`Methods are writing correct levels - ${methodDataProvider.method}`, async (_t) => {
     const { logger, loggedRecordsMethod } = buildLogger({
       ...getLoggerConfiguration("trace"),
@@ -164,5 +169,5 @@ methodsDataProvider.forEach((methodDataProvider) =>
       parsed.level_name,
       methodDataProvider.expected.level_name,
     );
-  }),
-);
+  });
+}
