@@ -1,7 +1,5 @@
-import assert from "node:assert";
-import { test } from "node:test";
 import { hostname } from "os";
-import { Level } from "pino";
+import { assert, describe, it } from "vitest";
 import { REDACTED_VALUE } from "../src/logging-wrapper-entities.js";
 import { getLoggerConfiguration } from "../src/logging-wrapper.js";
 import { buildLogger } from "./helpers/build-logger.js";
@@ -106,68 +104,74 @@ const methodsDataProvider = [
   },
 ];
 
-test("Basic format is the expected one", async (_t) => {
-  const { logger, loggedRecordsMethod } = buildLogger({
-    ...getLoggerConfiguration("debug"),
-  });
-  logger.debug("test message");
-  logger.info("another message");
+describe("Basic format is the expected one", () => {
+  it("should pass", async () => {
+    const { logger, loggedRecordsMethod } = buildLogger({
+      ...getLoggerConfiguration("debug"),
+    });
+    logger.debug("test message");
+    logger.info("another message");
 
-  const loggedRecords = loggedRecordsMethod();
-  assert.strictEqual(loggedRecords.length, 2);
+    const loggedRecords = loggedRecordsMethod();
+    assert.strictEqual(loggedRecords.length, 2);
 
-  const parsed = JSON.parse(loggedRecords[0]);
-  assert.strictEqual(typeof parsed.timestamp, "number");
-  assert.ok(
-    parsed.timestamp > Date.now() - 2000,
-    "the timestamp must be newer than 2 seconds ago",
-  );
-  // biome-ignore lint/performance/noDelete: Would change behaviour of the test
-  delete parsed.timestamp;
-  assert.deepStrictEqual(parsed, {
-    level: 20,
-    level_name: "DEBUG",
-    hostname: hostname(),
-    message: "test message",
+    const parsed = JSON.parse(loggedRecords[0]);
+    assert.strictEqual(typeof parsed.timestamp, "number");
+    assert.ok(
+      parsed.timestamp > Date.now() - 2000,
+      "the timestamp must be newer than 2 seconds ago",
+    );
+    // biome-ignore lint/performance/noDelete: Would change behaviour of the test
+    delete parsed.timestamp;
+    assert.deepStrictEqual(parsed, {
+      level: 20,
+      level_name: "DEBUG",
+      hostname: hostname(),
+      message: "test message",
+    });
   });
 });
 
-test("Fields are redacted as expected", async (_t) => {
-  const { logger, loggedRecordsMethod } = buildLogger({
-    ...getLoggerConfiguration(),
+describe("Fields are redacted as expected", () => {
+  it("should pass", async () => {
+    const { logger, loggedRecordsMethod } = buildLogger({
+      ...getLoggerConfiguration(),
+    });
+    logger.warn(toRedactFields.input_value);
+
+    const loggedRecords = loggedRecordsMethod();
+    const parsed = JSON.parse(loggedRecords[0]);
+    // biome-ignore lint/performance/noDelete: Would change behaviour of the test
+    delete parsed.hostname;
+    // biome-ignore lint/performance/noDelete: Would change behaviour of the test
+    delete parsed.level;
+    // biome-ignore lint/performance/noDelete: Would change behaviour of the test
+    delete parsed.level_name;
+    // biome-ignore lint/performance/noDelete: Would change behaviour of the test
+    delete parsed.timestamp;
+
+    assert.deepStrictEqual(parsed, toRedactFields.expected_output);
   });
-  logger.warn(toRedactFields.input_value);
-
-  const loggedRecords = loggedRecordsMethod();
-  const parsed = JSON.parse(loggedRecords[0]);
-  // biome-ignore lint/performance/noDelete: Would change behaviour of the test
-  delete parsed.hostname;
-  // biome-ignore lint/performance/noDelete: Would change behaviour of the test
-  delete parsed.level;
-  // biome-ignore lint/performance/noDelete: Would change behaviour of the test
-  delete parsed.level_name;
-  // biome-ignore lint/performance/noDelete: Would change behaviour of the test
-  delete parsed.timestamp;
-
-  assert.deepStrictEqual(parsed, toRedactFields.expected_output);
 });
 
 for (const methodDataProvider of methodsDataProvider) {
-  test(`Methods are writing correct levels - ${methodDataProvider.method}`, async (_t) => {
-    const { logger, loggedRecordsMethod } = buildLogger({
-      ...getLoggerConfiguration("trace"),
+  describe(`Methods are writing correct levels - ${methodDataProvider.method}`, () => {
+    it("should pass", async () => {
+      const { logger, loggedRecordsMethod } = buildLogger({
+        ...getLoggerConfiguration("trace"),
+      });
+
+      logger[methodDataProvider.method]("test");
+
+      const loggedRecords = loggedRecordsMethod();
+      assert.strictEqual(loggedRecords.length, 1);
+      const parsed = JSON.parse(loggedRecords[0]);
+
+      assert.strictEqual(parsed.level, methodDataProvider.expected.level);
+      assert.strictEqual(
+        parsed.level_name,
+        methodDataProvider.expected.level_name,
+      );
     });
-
-    logger[methodDataProvider.method]("test");
-
-    const loggedRecords = loggedRecordsMethod();
-    assert.strictEqual(loggedRecords.length, 1);
-    const parsed = JSON.parse(loggedRecords[0]);
-
-    assert.strictEqual(parsed.level, methodDataProvider.expected.level);
-    assert.strictEqual(
-      parsed.level_name,
-      methodDataProvider.expected.level_name,
-    );
   });
 }
