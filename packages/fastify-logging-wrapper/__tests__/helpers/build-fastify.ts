@@ -3,7 +3,7 @@ import {
   getLoggingConfiguration,
   initializeLoggingHooks,
 } from "../../src/fastify-logging-wrapper.js";
-import { DestinationStream } from "pino";
+import type { DestinationStream } from "pino";
 import { createError } from "@fastify/error";
 import { httpErrors } from "@fastify/sensible";
 
@@ -30,7 +30,7 @@ export const buildFastify = (loggerDestination?: DestinationStream) => {
     throw createError(
       "CUSTOM_CODE",
       requestedMessage as string,
-      requestedStatusCode as number
+      requestedStatusCode as number,
     )();
   });
 

@@ -1,10 +1,10 @@
-import { Level } from "pino";
-import { getLoggerConfiguration } from "../src/logging-wrapper.js";
-import { buildLogger } from "./helpers/build-logger.js";
-import { hostname } from "os";
-import { REDACTED_VALUE } from "../src/logging-wrapper-entities.js";
 import assert from "node:assert";
 import { test } from "node:test";
+import { hostname } from "os";
+import { Level } from "pino";
+import { REDACTED_VALUE } from "../src/logging-wrapper-entities.js";
+import { getLoggerConfiguration } from "../src/logging-wrapper.js";
+import { buildLogger } from "./helpers/build-logger.js";
 
 const getRandomFieldValue = () => Math.random().toString(36).slice(2);
 
@@ -106,7 +106,7 @@ const methodsDataProvider = [
   },
 ];
 
-test("Basic format is the expected one", async (t) => {
+test("Basic format is the expected one", async (_t) => {
   const { logger, loggedRecordsMethod } = buildLogger({
     ...getLoggerConfiguration("debug"),
   });
@@ -122,7 +122,7 @@ test("Basic format is the expected one", async (t) => {
     parsed.timestamp > Date.now() - 2000,
     "the timestamp must be newer than 2 seconds ago",
   );
-  delete parsed.timestamp;
+  parsed.timestamp = undefined;
   assert.deepStrictEqual(parsed, {
     level: 20,
     level_name: "DEBUG",
@@ -131,7 +131,7 @@ test("Basic format is the expected one", async (t) => {
   });
 });
 
-test("Fields are redacted as expected", async (t) => {
+test("Fields are redacted as expected", async (_t) => {
   const { logger, loggedRecordsMethod } = buildLogger({
     ...getLoggerConfiguration(),
   });
@@ -148,7 +148,7 @@ test("Fields are redacted as expected", async (t) => {
 });
 
 methodsDataProvider.forEach((methodDataProvider) =>
-  test(`Methods are writing correct levels - ${methodDataProvider.method}`, async (t) => {
+  test(`Methods are writing correct levels - ${methodDataProvider.method}`, async (_t) => {
     const { logger, loggedRecordsMethod } = buildLogger({
       ...getLoggerConfiguration("trace"),
     });

@@ -1,18 +1,18 @@
-import { FastifyRequest, FastifyReply, FastifyError } from "fastify";
+import type { FastifyRequest, FastifyReply, FastifyError } from "fastify";
 import { hostname } from "os";
 import {
-  LoggingContext,
-  LoggingRequest,
-  FullLoggingRequest,
-  LoggingResponse,
-  LoggingError,
+  type LoggingContext,
+  type LoggingRequest,
+  type FullLoggingRequest,
+  type LoggingResponse,
+  type LoggingError,
   REDACTED_VALUE,
   REDACTED_PATHS,
   MESSAGE_KEY,
   toLoggingError,
 } from "./logging-wrapper-entities.js";
-import { LogLevel, PinoLoggerOptions } from "fastify/types/logger.js";
-import { HttpError } from "@fastify/sensible";
+import type { LogLevel, PinoLoggerOptions } from "fastify/types/logger.js";
+import type { HttpError } from "@fastify/sensible";
 
 const loggingContext: LoggingContext = {};
 

@@ -1,5 +1,5 @@
-import test from 'node:test';
-import assert from 'node:assert/strict';
+import test from "node:test";
+import assert from "node:assert/strict";
 import { LogErrorClasses } from "../src/logging-wrapper-entities.js";
 import {
   DEFAULT_METHOD,
@@ -11,7 +11,7 @@ import {
   parseLogEntry,
   runErrorTest,
 } from "./helpers/fastify-test-helpers.js";
-import { httpErrors } from '@fastify/sensible';
+import { httpErrors } from "@fastify/sensible";
 
 test("Error data are correctly set", async (t) => {
   const { server, loggingDestination } = initializeServer();

@@ -1,5 +1,5 @@
-import test from 'node:test';
-import assert from 'node:assert/strict';
+import test from "node:test";
+import assert from "node:assert/strict";
 import {
   DEFAULT_METHOD,
   initializeServer,
@@ -36,7 +36,7 @@ errorsProvider.forEach((errorProv) =>
       requestId: "req-1",
       name: errorInstance.name,
     });
-  })
+  }),
 );
 
 test(`Custom error is managed based on parameters`, async (t) => {

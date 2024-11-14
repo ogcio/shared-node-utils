@@ -8,4 +8,7 @@ export {
   LoggingError,
 } from "./logging-wrapper-entities.js";
 
-export { getLoggingContextError, setLoggingContext } from "./logging-wrapper.js";
+export {
+  getLoggingContextError,
+  setLoggingContext,
+} from "./logging-wrapper.js";

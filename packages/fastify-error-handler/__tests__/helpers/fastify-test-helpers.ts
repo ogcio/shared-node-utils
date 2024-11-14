@@ -1,4 +1,4 @@
-import { FastifyInstance } from "fastify";
+import type { FastifyInstance } from "fastify";
 import { buildFastify } from "./build-fastify.js";
 export const DEFAULT_HOSTNAME = "localhost:80";
 export const DEFAULT_USER_AGENT = "lightMyRequest";
@@ -34,7 +34,7 @@ export const initializeServer = async (): Promise<{
   loggingDestination: TestingLoggerDestination;
 }> => {
   const loggingDestination = getTestingDestinationLogger();
-  const server =  await buildFastify(loggingDestination.loggerDestination);
+  const server = await buildFastify(loggingDestination.loggerDestination);
 
   return { server, loggingDestination };
 };
