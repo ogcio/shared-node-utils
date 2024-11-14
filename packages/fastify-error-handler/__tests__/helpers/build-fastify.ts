@@ -5,7 +5,7 @@ import { initializeErrorHandler } from "../../src/index.js";
 import fastifySensible from "@fastify/sensible";
 import httpErrors from "http-errors";
 export const buildFastify = async (
-  loggerDestination?: DestinationStream
+  loggerDestination?: DestinationStream,
 ): Promise<FastifyInstance> => {
   const server = fastify({ loggerInstance: pino({}, loggerDestination) });
   initializeErrorHandler(server as unknown as FastifyInstance);
@@ -22,7 +22,7 @@ export const buildFastify = async (
     throw createError(
       "CUSTOM_CODE",
       requestedMessage as string,
-      requestedStatusCode as number
+      requestedStatusCode as number,
     )();
   });
 
@@ -60,7 +60,7 @@ export const buildFastify = async (
 
     throw server.httpErrors.createError(
       requestedStatusCode as number,
-      "message"
+      "message",
     );
   });
 
@@ -73,12 +73,13 @@ export const buildFastify = async (
   });
 
   server.get("/life-events/:errorCode", async (request, _reply) => {
-    const errorCode = Number((request.params! as { errorCode: string })
-      .errorCode);
+    const errorCode = Number(
+      (request.params! as { errorCode: string }).errorCode,
+    );
     if (!httpErrors[errorCode]) {
       throw new Error("Wrong parameter");
     }
-   
+
     const errorObj = httpErrors[errorCode];
 
     throw new errorObj("Failed Correctly!");

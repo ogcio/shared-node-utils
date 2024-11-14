@@ -23,7 +23,7 @@ export const initializeLoggingHooks = (server: FastifyInstance): void => {
     setLoggingContext({ request });
     request.log.info(
       { request: parseFullLoggingRequest(request) },
-      LogMessages.NewRequest
+      LogMessages.NewRequest,
     );
     done();
   });
@@ -34,7 +34,7 @@ export const initializeLoggingHooks = (server: FastifyInstance): void => {
     // Include error in API Track if exists
     reply.log.info(
       { error: getPartialLoggingContextError() },
-      LogMessages.ApiTrack
+      LogMessages.ApiTrack,
     );
     resetLoggingContext();
     done();
@@ -57,7 +57,7 @@ export const getLoggingConfiguration = (customConfig?: {
     return {
       loggerInstance: pino(
         { ...getLoggerConfiguration(), ...(customConfig?.pinoOptions ?? {}) },
-        customConfig?.loggerDestination
+        customConfig?.loggerDestination,
       ),
       disableRequestLogging: true,
       genReqId: () => hyperidInstance(),

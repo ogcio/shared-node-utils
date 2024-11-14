@@ -8,7 +8,7 @@ import {
   LogErrorClasses,
   LogMessages,
 } from "../../src/logging-wrapper-entities.js";
-import assert from 'node:assert/strict';
+import assert from "node:assert/strict";
 
 export const DEFAULT_HOSTNAME = "localhost";
 export const DEFAULT_PORT = 80;
@@ -77,7 +77,10 @@ export const checkExpectedRequestEntry = (params: {
   assert.equal(parsed.request?.path, params.inputPath);
   assert.equal(parsed.request?.hostname, DEFAULT_HOSTNAME);
   assert.equal(parsed.request?.port, DEFAULT_PORT);
-  assert.deepStrictEqual(parsed.request?.query_params, params.inputQueryParams ?? {});
+  assert.deepStrictEqual(
+    parsed.request?.query_params,
+    params.inputQueryParams ?? {},
+  );
   assert.deepStrictEqual(parsed.request?.headers, {
     ...DEFAULT_REQUEST_HEADERS,
     ...(params.inputHeaders ?? {}),
@@ -111,7 +114,10 @@ export const checkExpectedResponseEntry = (params: {
   assert.equal(parsed.request.path, params.inputPath);
   assert.equal(parsed.request.hostname, DEFAULT_HOSTNAME);
   assert.equal(parsed.request.port, DEFAULT_PORT);
-  assert.deepStrictEqual(parsed.request.query_params, params.inputQueryParams ?? {});
+  assert.deepStrictEqual(
+    parsed.request.query_params,
+    params.inputQueryParams ?? {},
+  );
   assert.ok(typeof parsed.response !== "undefined");
   assert.equal(parsed.response.status_code, params.responseStatusCode);
   assert.equal(parsed.response.headers["content-type"], DEFAULT_CONTENT_TYPE);
@@ -177,7 +183,10 @@ export const checkExpectedErrorEntry = (params: {
   assert.equal(parsed.request?.path, params.inputPath);
   assert.equal(parsed.request?.hostname, DEFAULT_HOSTNAME);
   assert.equal(parsed.request?.port, DEFAULT_PORT);
-  assert.deepStrictEqual(parsed.request?.query_params, params.inputQueryParams ?? {});
+  assert.deepStrictEqual(
+    parsed.request?.query_params,
+    params.inputQueryParams ?? {},
+  );
   assert.ok(typeof parsed.error !== "undefined");
   assert.equal(parsed.error.class, params.errorClass);
   assert.equal(parsed.error.code, params.errorCode);

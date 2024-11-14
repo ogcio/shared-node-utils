@@ -10,7 +10,7 @@ import { httpErrors } from "@fastify/sensible";
 export const buildFastify = (loggerDestination?: DestinationStream) => {
   const server = Fastify({
     ...getLoggingConfiguration({
-      loggerDestination: loggerDestination
+      loggerDestination: loggerDestination,
     }),
   });
 
@@ -32,7 +32,7 @@ export const buildFastify = (loggerDestination?: DestinationStream) => {
     throw createError(
       "CUSTOM_CODE",
       requestedMessage as string,
-      requestedStatusCode as number
+      requestedStatusCode as number,
     )();
   });
 

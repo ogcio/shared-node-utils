@@ -34,7 +34,7 @@ export const initializeServer = async (): Promise<{
   loggingDestination: TestingLoggerDestination;
 }> => {
   const loggingDestination = getTestingDestinationLogger();
-  const server =  await buildFastify(loggingDestination.loggerDestination);
+  const server = await buildFastify(loggingDestination.loggerDestination);
 
   return { server, loggingDestination };
 };

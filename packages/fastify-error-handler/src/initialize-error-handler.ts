@@ -39,7 +39,7 @@ export const setupErrorHandler = (server: FastifyInstance): void => {
       status?: number;
       statusCode?: number;
     },
-    reply: FastifyReply
+    reply: FastifyReply,
   ) => {
     const res = reply.raw;
     let statusCode = res.statusCode;
@@ -90,7 +90,7 @@ export const initializeNotFoundHandler = (server: FastifyInstance): void => {
 };
 
 const getValidationFromFastifyError = (
-  validationInput: FastifySchemaValidationError[]
+  validationInput: FastifySchemaValidationError[],
 ): { validation: ValidationErrorData[] } => {
   const output: ValidationErrorData[] = [];
 
@@ -121,7 +121,7 @@ const getValidationFromFastifyError = (
 
 const getResponseFromFastifyError = (
   error: FastifyError,
-  request: FastifyRequest
+  request: FastifyRequest,
 ): OutputHttpError => {
   const output: OutputHttpError = {
     code: parseHttpErrorClass(error.statusCode),
@@ -131,7 +131,7 @@ const getResponseFromFastifyError = (
   };
   if (error.validation && error.validation.length > 0) {
     output.validation = getValidationFromFastifyError(
-      error.validation
+      error.validation,
     ).validation;
   }
 
@@ -141,7 +141,7 @@ const getResponseFromFastifyError = (
 const manageHttpError = (
   error: HttpError,
   request: FastifyRequest,
-  reply: FastifyReply
+  reply: FastifyReply,
 ): void => {
   reply.raw.statusCode = error.statusCode;
   reply.statusCode = error.statusCode;
@@ -175,6 +175,6 @@ const toOutputHttpValidationError = (error: FastifyError): HttpError => {
   return httpErrors.createError(
     422,
     error.message,
-    getValidationFromFastifyError(error.validation)
+    getValidationFromFastifyError(error.validation),
   );
 };

@@ -158,7 +158,7 @@ test("getLoggingConfiguration with customConfig, should create new logger instan
   const symMessageKey = Reflect.ownKeys(fastifyConfig.loggerInstance).find(
     (s) => {
       return String(s) === "Symbol(pino.messageKey)";
-    }
+    },
   );
 
   assert.equal(fastifyConfig.loggerInstance[symMessageKey!], "TEST_NAME");
@@ -168,6 +168,6 @@ test("getLoggingConfiguration with customConfig, should create new logger instan
   });
 
   assert.ok(
-    fastifyConfig.loggerInstance[symStream!] instanceof TestDestinationStream
+    fastifyConfig.loggerInstance[symStream!] instanceof TestDestinationStream,
   );
 });

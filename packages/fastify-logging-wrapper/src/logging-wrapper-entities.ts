@@ -1,9 +1,7 @@
 import { FastifyError } from "fastify";
-import {
-  parseErrorForLogging,
-} from "@ogcio/shared-errors";
-import { HttpError} from "@fastify/sensible";
-import {isHttpError} from "http-errors";
+import { parseErrorForLogging } from "@ogcio/shared-errors";
+import { HttpError } from "@fastify/sensible";
+import { isHttpError } from "http-errors";
 
 export interface LoggingRequest {
   scheme: string;
@@ -102,9 +100,7 @@ export const toLoggingError = (
   };
 };
 
-const parseErrorClass = (
-  error: FastifyError | HttpError,
-): LogErrorClasses => {
+const parseErrorClass = (error: FastifyError | HttpError): LogErrorClasses => {
   if (!error.statusCode) {
     return LogErrorClasses.UnknownError;
   }
