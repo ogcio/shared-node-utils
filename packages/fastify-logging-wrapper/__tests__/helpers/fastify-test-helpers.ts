@@ -1,5 +1,5 @@
-import assert from "node:assert/strict";
 import type { FastifyInstance } from "fastify";
+import { assert } from "vitest";
 import {
   type LogErrorClasses,
   LogMessages,
