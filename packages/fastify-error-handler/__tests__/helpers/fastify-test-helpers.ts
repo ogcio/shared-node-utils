@@ -1,4 +1,4 @@
-import { FastifyInstance } from "fastify";
+import type { FastifyInstance } from "fastify";
 import { buildFastify } from "./build-fastify.js";
 export const DEFAULT_HOSTNAME = "localhost:80";
 export const DEFAULT_USER_AGENT = "lightMyRequest";
@@ -34,11 +34,11 @@ export const initializeServer = async (): Promise<{
   loggingDestination: TestingLoggerDestination;
 }> => {
   const loggingDestination = getTestingDestinationLogger();
-  const server =  await buildFastify(loggingDestination.loggerDestination);
+  const server = await buildFastify(loggingDestination.loggerDestination);
 
   return { server, loggingDestination };
 };
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+// biome-ignore lint/suspicious/noExplicitAny: <explanation>
 export const parseLogEntry = (logEntry: string): { [x: string]: any } =>
   JSON.parse(logEntry);
