@@ -1,5 +1,5 @@
-import assert from "node:assert/strict";
 import type { FastifyInstance } from "fastify";
+import { assert } from "vitest";
 import {
   type LogErrorClasses,
   LogMessages,
@@ -33,6 +33,7 @@ export const initializeServer = (): {
   return { server, loggingDestination };
 };
 
+// biome-ignore lint/suspicious/noExplicitAny: <explanation>
 // biome-ignore lint/suspicious/noExplicitAny: <explanation>
 export const parseLogEntry = (logEntry: string): { [x: string]: any } =>
   JSON.parse(logEntry);
@@ -81,6 +82,10 @@ export const checkExpectedRequestEntry = (params: {
     parsed.request?.query_params,
     params.inputQueryParams ?? {},
   );
+  assert.deepStrictEqual(
+    parsed.request?.query_params,
+    params.inputQueryParams ?? {},
+  );
   assert.deepStrictEqual(parsed.request?.headers, {
     ...DEFAULT_REQUEST_HEADERS,
     ...(params.inputHeaders ?? {}),
@@ -114,6 +119,10 @@ export const checkExpectedResponseEntry = (params: {
   assert.equal(parsed.request.path, params.inputPath);
   assert.equal(parsed.request.hostname, DEFAULT_HOSTNAME);
   assert.equal(parsed.request.port, DEFAULT_PORT);
+  assert.deepStrictEqual(
+    parsed.request.query_params,
+    params.inputQueryParams ?? {},
+  );
   assert.deepStrictEqual(
     parsed.request.query_params,
     params.inputQueryParams ?? {},
@@ -183,6 +192,10 @@ export const checkExpectedErrorEntry = (params: {
   assert.equal(parsed.request?.path, params.inputPath);
   assert.equal(parsed.request?.hostname, DEFAULT_HOSTNAME);
   assert.equal(parsed.request?.port, DEFAULT_PORT);
+  assert.deepStrictEqual(
+    parsed.request?.query_params,
+    params.inputQueryParams ?? {},
+  );
   assert.deepStrictEqual(
     parsed.request?.query_params,
     params.inputQueryParams ?? {},
