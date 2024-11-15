@@ -1,4 +1,4 @@
-import { FastifyServerOptions, FastifyInstance } from "fastify";
+import type { FastifyServerOptions, FastifyInstance } from "fastify";
 import hyperid from "hyperid";
 import {
   LogMessages,
@@ -12,9 +12,9 @@ import {
   resetLoggingContext,
   setLoggingContext,
 } from "./logging-wrapper.js";
-import { pino, DestinationStream } from "pino";
+import { pino, type DestinationStream } from "pino";
 import { REQUEST_ID_HEADER } from "@ogcio/shared-errors";
-import { PinoLoggerOptions } from "fastify/types/logger.js";
+import type { PinoLoggerOptions } from "fastify/types/logger.js";
 
 const hyperidInstance = hyperid({ fixedLength: true, urlSafe: true });
 
@@ -23,7 +23,7 @@ export const initializeLoggingHooks = (server: FastifyInstance): void => {
     setLoggingContext({ request });
     request.log.info(
       { request: parseFullLoggingRequest(request) },
-      LogMessages.NewRequest
+      LogMessages.NewRequest,
     );
     done();
   });
@@ -34,7 +34,7 @@ export const initializeLoggingHooks = (server: FastifyInstance): void => {
     // Include error in API Track if exists
     reply.log.info(
       { error: getPartialLoggingContextError() },
-      LogMessages.ApiTrack
+      LogMessages.ApiTrack,
     );
     resetLoggingContext();
     done();
@@ -57,7 +57,7 @@ export const getLoggingConfiguration = (customConfig?: {
     return {
       loggerInstance: pino(
         { ...getLoggerConfiguration(), ...(customConfig?.pinoOptions ?? {}) },
-        customConfig?.loggerDestination
+        customConfig?.loggerDestination,
       ),
       disableRequestLogging: true,
       genReqId: () => hyperidInstance(),

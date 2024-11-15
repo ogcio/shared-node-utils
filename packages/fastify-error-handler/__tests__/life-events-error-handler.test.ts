@@ -1,11 +1,11 @@
-import test from 'node:test';
-import assert from 'node:assert/strict';
+import assert from "node:assert/strict";
+import test from "node:test";
+import * as sharedErrors from "@ogcio/shared-errors";
+import httpErrors from "http-errors";
 import {
   DEFAULT_METHOD,
   initializeServer,
 } from "./helpers/fastify-test-helpers.js";
-import httpErrors from "http-errors";
-import * as sharedErrors from "@ogcio/shared-errors";
 
 const errorsProvider = [
   { errorType: httpErrors[401], expectedStatusCode: 401 },
@@ -16,7 +16,7 @@ const errorsProvider = [
   { errorType: httpErrors[502], expectedStatusCode: 502 },
 ];
 
-errorsProvider.forEach((errorProv) =>
+for (const errorProv of errorsProvider) {
   test(`Error is managed in the correct way - ${errorProv.errorType.name}`, async (t) => {
     const { server } = await initializeServer();
     t.after(() => server.close());
@@ -36,16 +36,16 @@ errorsProvider.forEach((errorProv) =>
       requestId: "req-1",
       name: errorInstance.name,
     });
-  })
-);
+  });
+}
 
-test(`Custom error is managed based on parameters`, async (t) => {
+test("Custom error is managed based on parameters", async (t) => {
   const { server } = await initializeServer();
   t.after(() => server.close());
 
   const response = await server.inject({
     method: DEFAULT_METHOD,
-    url: `/life-events/custom`,
+    url: "/life-events/custom",
     query: { status_code: "503" },
   });
 
@@ -59,13 +59,13 @@ test(`Custom error is managed based on parameters`, async (t) => {
   });
 });
 
-test(`Validation error is managed as expected`, async (t) => {
+test("Validation error is managed as expected", async (t) => {
   const { server } = await initializeServer();
   t.after(() => server.close());
 
   const response = await server.inject({
     method: DEFAULT_METHOD,
-    url: `/life-events/validation`,
+    url: "/life-events/validation",
   });
 
   assert.ok(typeof response !== "undefined");

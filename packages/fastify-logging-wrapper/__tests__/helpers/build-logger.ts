@@ -1,4 +1,4 @@
-import { PinoLoggerOptions } from "fastify/types/logger.js";
+import type { PinoLoggerOptions } from "fastify/types/logger.js";
 import { pino } from "pino";
 
 export const buildLogger = (loggerConfiguration: PinoLoggerOptions) => {

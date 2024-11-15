@@ -1,5 +1,9 @@
-import test from "node:test";
 import assert from "node:assert/strict";
+import test from "node:test";
+import { httpErrors } from "@fastify/sensible";
+import type { FastifyServerOptions } from "fastify";
+import type { DestinationStream } from "pino";
+import { getLoggingConfiguration } from "../src/fastify-logging-wrapper.js";
 import { LogErrorClasses } from "../src/logging-wrapper-entities.js";
 import {
   DEFAULT_METHOD,
@@ -11,10 +15,6 @@ import {
   parseLogEntry,
   runErrorTest,
 } from "./helpers/fastify-test-helpers.js";
-import { httpErrors } from "@fastify/sensible";
-import { getLoggingConfiguration } from "../src/fastify-logging-wrapper.js";
-import { FastifyServerOptions } from "fastify";
-import { DestinationStream } from "pino";
 
 test("Error data are correctly set", async (t) => {
   const { server, loggingDestination } = initializeServer();
@@ -140,7 +140,7 @@ test("getLoggingConfiguration without customConfig, should use default pino logg
 
 test("getLoggingConfiguration with customConfig, should create new logger instance", () => {
   class TestDestinationStream implements DestinationStream {
-    write(msg: string): void {
+    write(_msg: string): void {
       throw new Error("Test example!");
     }
   }
@@ -158,9 +158,10 @@ test("getLoggingConfiguration with customConfig, should create new logger instan
   const symMessageKey = Reflect.ownKeys(fastifyConfig.loggerInstance).find(
     (s) => {
       return String(s) === "Symbol(pino.messageKey)";
-    }
+    },
   );
 
+  // biome-ignore lint/style/noNonNullAssertion: <explanation>
   assert.equal(fastifyConfig.loggerInstance[symMessageKey!], "TEST_NAME");
 
   const symStream = Reflect.ownKeys(fastifyConfig.loggerInstance).find((s) => {
@@ -168,6 +169,7 @@ test("getLoggingConfiguration with customConfig, should create new logger instan
   });
 
   assert.ok(
-    fastifyConfig.loggerInstance[symStream!] instanceof TestDestinationStream
+    // biome-ignore lint/style/noNonNullAssertion: <explanation>
+    fastifyConfig.loggerInstance[symStream!] instanceof TestDestinationStream,
   );
 });

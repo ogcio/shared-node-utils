@@ -1,34 +1,34 @@
-import { FastifyError, createError } from "@fastify/error";
-import { pino, DestinationStream } from "pino";
-import fastify, { FastifyInstance } from "fastify";
-import { initializeErrorHandler } from "../../src/index.js";
+import { type FastifyError, createError } from "@fastify/error";
 import fastifySensible from "@fastify/sensible";
+import fastify, { type FastifyInstance } from "fastify";
 import httpErrors from "http-errors";
+import { type DestinationStream, pino } from "pino";
+import { initializeErrorHandler } from "../../src/index.js";
 export const buildFastify = async (
-  loggerDestination?: DestinationStream
+  loggerDestination?: DestinationStream,
 ): Promise<FastifyInstance> => {
   const server = fastify({ loggerInstance: pino({}, loggerDestination) });
   initializeErrorHandler(server as unknown as FastifyInstance);
   await server.register(fastifySensible);
   server.get("/error", async (request, _reply) => {
     const parsed = request.query as { [x: string]: unknown };
-    const requestedStatusCode = Number(parsed["status_code"] ?? "500");
-    const requestedMessage = String(parsed["error_message"] ?? "WHOOOPS");
+    const requestedStatusCode = Number(parsed.status_code ?? "500");
+    const requestedMessage = String(parsed.error_message ?? "WHOOOPS");
 
-    if (!parsed["status_code"]) {
+    if (!parsed.status_code) {
       throw new Error(requestedMessage);
     }
 
     throw createError(
       "CUSTOM_CODE",
       requestedMessage as string,
-      requestedStatusCode as number
+      requestedStatusCode as number,
     )();
   });
 
   server.get("/validation", async (request, _reply) => {
     const parsed = request.query as { [x: string]: unknown };
-    const requestedMessage = String(parsed["error_message"] ?? "WHOOOPS");
+    const requestedMessage = String(parsed.error_message ?? "WHOOOPS");
 
     const error = createError(
       "CUSTOM_CODE",
@@ -56,11 +56,11 @@ export const buildFastify = async (
 
   server.get("/life-events/custom", async (request, _reply) => {
     const parsed = request.query as { [x: string]: unknown };
-    const requestedStatusCode = Number(parsed["status_code"] ?? "500");
+    const requestedStatusCode = Number(parsed.status_code ?? "500");
 
     throw server.httpErrors.createError(
       requestedStatusCode as number,
-      "message"
+      "message",
     );
   });
 
@@ -73,12 +73,13 @@ export const buildFastify = async (
   });
 
   server.get("/life-events/:errorCode", async (request, _reply) => {
-    const errorCode = Number((request.params! as { errorCode: string })
-      .errorCode);
+    const errorCode = request.params
+      ? Number((request.params as { errorCode: string }).errorCode)
+      : "DO NOT EXIST";
     if (!httpErrors[errorCode]) {
       throw new Error("Wrong parameter");
     }
-   
+
     const errorObj = httpErrors[errorCode];
 
     throw new errorObj("Failed Correctly!");

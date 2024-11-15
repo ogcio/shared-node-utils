@@ -2,14 +2,16 @@
   "name": "shared-node-utils",
   "version": "1.0.0",
   "private": true,
-  "workspaces": [
-    "packages/*"
-  ],
+  "workspaces": ["packages/*"],
   "scripts": {
     "build": "npm run build --ws",
     "publish": "lerna publish --no-private",
     "version": "lerna version --no-private",
-    "prepare": "husky"
+    "prepare": "husky",
+    "check:formatting": "biome format",
+    "fix:formatting": "biome format --write",
+    "check:linting": "biome lint",
+    "fix:linting": "biome lint --write"
   },
   "keywords": [],
   "author": {
@@ -19,6 +21,7 @@
   "license": "ISC",
   "description": "Group of Node.js utils projects used in the OGCIO projects",
   "devDependencies": {
+    "@biomejs/biome": "^1.9.4",
     "@commitlint/config-conventional": "^19.5.0",
     "@types/node": "^22.7.4",
     "commitlint": "^19.5.0",

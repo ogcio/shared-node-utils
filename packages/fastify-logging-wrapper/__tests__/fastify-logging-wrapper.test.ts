@@ -1,8 +1,16 @@
 import { LogMessages } from "../src/logging-wrapper-entities.js";
-import { initializeServer, DEFAULT_METHOD, DEFAULT_PATH, checkExpectedRequestEntry, checkExpectedResponseEntry, parseLogEntry, checkGenericEntryFields } from "./helpers/fastify-test-helpers.js";
+import {
+  initializeServer,
+  DEFAULT_METHOD,
+  DEFAULT_PATH,
+  checkExpectedRequestEntry,
+  checkExpectedResponseEntry,
+  parseLogEntry,
+  checkGenericEntryFields,
+} from "./helpers/fastify-test-helpers.js";
 import { REQUEST_ID_HEADER } from "@ogcio/shared-errors";
 import assert from "node:assert";
-import { test } from 'node:test';
+import { test } from "node:test";
 
 test("Logging entries when all works fine are the expected ones", async (t) => {
   const { server, loggingDestination } = initializeServer();
