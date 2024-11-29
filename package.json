@@ -11,7 +11,8 @@
     "check:formatting": "biome format",
     "fix:formatting": "biome format --write",
     "check:linting": "biome lint",
-    "fix:linting": "biome lint --write"
+    "fix:linting": "biome lint --write",
+    "test": "npm run test -w=@ogcio/fastify-error-handler && npm run test -w=@ogcio/fastify-logging-wrapper"
   },
   "keywords": [],
   "author": {
@@ -22,13 +23,13 @@
   "description": "Group of Node.js utils projects used in the OGCIO projects",
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",
-    "@commitlint/config-conventional": "^19.5.0",
+    "@commitlint/config-conventional": "^19.6.0",
     "@types/node": "^22.9.0",
-    "@vitest/coverage-istanbul": "^2.1.5",
-    "commitlint": "^19.5.0",
-    "husky": "^9.1.6",
+    "@vitest/coverage-istanbul": "^2.1.6",
+    "commitlint": "^19.6.0",
+    "husky": "^9.1.7",
     "lerna": "^8.1.9",
-    "typescript": "^5.6.3",
-    "vitest": "^2.1.5"
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.6"
   }
 }
