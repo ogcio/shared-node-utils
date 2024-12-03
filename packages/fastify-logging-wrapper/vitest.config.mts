@@ -2,12 +2,11 @@ import { defineConfig } from "vitest/config";
 
 export default defineConfig({
   test: {
-    reporters: "junit",
+    reporters: "default",
     coverage: {
-      reporter: ["text"],
+      reporter: ["text", "cobertura"],
       provider: "istanbul",
     },
-
     include: [
       "**/@(test?(s)|__test?(s)__)/**/*.test.@(js|cjs|mjs|tap|cts|jsx|mts|ts|tsx)",
       "**/*.@(test?(s)|spec).@(js|cjs|mjs|tap|cts|jsx|mts|ts|tsx)",
