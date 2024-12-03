@@ -12,7 +12,8 @@
     "fix:formatting": "biome format --write",
     "check:linting": "biome lint",
     "fix:linting": "biome lint --write",
-    "test": "npm run test -w=@ogcio/fastify-error-handler && npm run test -w=@ogcio/fastify-logging-wrapper"
+    "test": "npm run test -w=@ogcio/fastify-error-handler && npm run test -w=@ogcio/fastify-logging-wrapper",
+    "prepublishOnly": "npm i && npm run build && npm run test"
   },
   "keywords": [],
   "author": {
