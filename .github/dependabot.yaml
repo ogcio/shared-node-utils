@@ -1,0 +1,16 @@
+version: 2
+updates:
+  - package-ecosystem: "npm"
+    directories:
+      - "/"
+      - "/packages/fastify-error-handler"
+      - "/packages/fastify-logging-wrapper"
+      - "/packages/shared-errors"
+    schedule:
+      interval: "weekly"
+      time: "23:00" # UTC time
+    open-pull-requests-limit: 1
+    groups:
+      all-dependencies:
+        patterns:
+          - "*"
