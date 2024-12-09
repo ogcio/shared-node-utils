@@ -1,18 +1,18 @@
-import type { FastifyRequest, FastifyReply, FastifyError } from "fastify";
 import { hostname } from "os";
+import type { HttpError } from "@fastify/sensible";
+import type { FastifyError, FastifyReply, FastifyRequest } from "fastify";
+import type { LogLevel, PinoLoggerOptions } from "fastify/types/logger.js";
 import {
-  type LoggingContext,
-  type LoggingRequest,
   type FullLoggingRequest,
-  type LoggingResponse,
+  type LoggingContext,
   type LoggingError,
-  REDACTED_VALUE,
-  REDACTED_PATHS,
+  type LoggingRequest,
+  type LoggingResponse,
   MESSAGE_KEY,
+  REDACTED_PATHS,
+  REDACTED_VALUE,
   toLoggingError,
 } from "./logging-wrapper-entities.js";
-import type { LogLevel, PinoLoggerOptions } from "fastify/types/logger.js";
-import type { HttpError } from "@fastify/sensible";
 
 const loggingContext: LoggingContext = {};
 
@@ -83,7 +83,7 @@ const parseLoggingResponse = (res: FastifyReply): LoggingResponse => ({
 });
 
 export const getLoggerConfiguration = (
-  minimumLevel: LogLevel = "debug",
+  customLoggerOptions?: PinoLoggerOptions,
 ): PinoLoggerOptions => ({
   base: { hostname: hostname() },
   messageKey: MESSAGE_KEY,
@@ -102,5 +102,5 @@ export const getLoggerConfiguration = (
       level_name: name.toUpperCase(),
     }),
   },
-  level: minimumLevel,
+  ...(customLoggerOptions ?? {}),
 });

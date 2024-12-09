@@ -107,7 +107,7 @@ const methodsDataProvider = [
 describe("Basic format is the expected one", () => {
   it("should pass", async () => {
     const { logger, loggedRecordsMethod } = buildLogger({
-      ...getLoggerConfiguration("debug"),
+      ...getLoggerConfiguration({ level: "debug" }),
     });
     logger.debug("test message");
     logger.info("another message");
@@ -158,7 +158,7 @@ for (const methodDataProvider of methodsDataProvider) {
   describe(`Methods are writing correct levels - ${methodDataProvider.method}`, () => {
     it("should pass", async () => {
       const { logger, loggedRecordsMethod } = buildLogger({
-        ...getLoggerConfiguration("trace"),
+        ...getLoggerConfiguration({ level: "trace" }),
       });
 
       logger[methodDataProvider.method]("test");

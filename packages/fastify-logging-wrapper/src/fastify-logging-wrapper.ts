@@ -1,5 +1,8 @@
-import type { FastifyServerOptions, FastifyInstance } from "fastify";
+import { REQUEST_ID_HEADER } from "@ogcio/shared-errors";
+import type { FastifyInstance, FastifyServerOptions } from "fastify";
+import type { PinoLoggerOptions } from "fastify/types/logger.js";
 import hyperid from "hyperid";
+import { type DestinationStream, pino } from "pino";
 import {
   LogMessages,
   REQUEST_ID_LOG_LABEL,
@@ -12,8 +15,6 @@ import {
   resetLoggingContext,
   setLoggingContext,
 } from "./logging-wrapper.js";
-import { pino, type DestinationStream } from "pino";
-import { REQUEST_ID_HEADER } from "@ogcio/shared-errors";
 
 const hyperidInstance = hyperid({ fixedLength: true, urlSafe: true });
 
@@ -50,8 +51,9 @@ export const initializeLoggingHooks = (server: FastifyInstance): void => {
 
 export const getLoggingConfiguration = (
   loggerDestination?: DestinationStream,
+  customLoggerOptions?: PinoLoggerOptions,
 ): FastifyServerOptions => ({
-  logger: pino(getLoggerConfiguration(), loggerDestination),
+  logger: pino(getLoggerConfiguration(customLoggerOptions), loggerDestination),
   disableRequestLogging: true,
   genReqId: () => hyperidInstance(),
   requestIdLogLabel: REQUEST_ID_LOG_LABEL,
