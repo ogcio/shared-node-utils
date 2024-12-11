@@ -1,32 +1,30 @@
 {
   "name": "@ogcio/nextjs-logging-wrapper",
-  "version": "14.2.6",
+  "version": "14.2.8",
   "description": "",
   "type": "module",
   "exports": {
-    "./client-logger": "./dist/src/client-logger.js",
-    "./common-logger": "./dist/src/common-logger.js",
-    "./server-logger": "./dist/src/server-logger.js"
+    "./client-logger": "./dist/client-logger.js",
+    "./common-logger": "./dist/common-logger.js",
+    "./server-logger": "./dist/server-logger.js"
   },
   "typesVersions": {
     "*": {
-      "client-logger": ["./dist/src/client-logger.d.ts"],
-      "common-logger": ["./dist/src/common-logger.d.ts"],
-      "server-logger": ["./dist/src/server-logger.d.ts"]
+      "client-logger": ["./dist/client-logger.d.ts"],
+      "common-logger": ["./dist/common-logger.d.ts"],
+      "server-logger": ["./dist/server-logger.d.ts"]
     }
   },
   "scripts": {
     "dev": "rm -rf dist && tsc -w -p tsconfig.prod.json",
-    "build": "rm -rf dist && tsc -p tsconfig.prod.json",
+    "build": "rm -rf dist tsconfig.prod.tsbuildinfo tsconfig.tsbuildinfo && tsc -p tsconfig.prod.json",
     "test": "echo \"Error: no test specified\" && exit 0",
-    "lint": "eslint . --ext .ts",
-    "lint:fix": "eslint . --ext .ts --fix"
+    "prepublishOnly": "npm i && npm run build"
   },
   "keywords": [],
   "author": "samuele.salvatico@nearform.com",
   "license": "ISC",
   "devDependencies": {
-    "@tsconfig/node20": "^20.1.4",
     "@types/node": "^22.10.2",
     "typescript": "^5.7.2"
   },
@@ -34,5 +32,9 @@
     "next": "^14.2.5",
     "pino": "^9.5.0",
     "@ogcio/shared-errors": "^1.0.0"
-  }
+  },
+  "files": [
+    "dist",
+    "src"
+  ]
 }
