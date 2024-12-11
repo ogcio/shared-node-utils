@@ -1,0 +1,38 @@
+{
+  "name": "@ogcio/nextjs-logging-wrapper",
+  "version": "14.2.5",
+  "description": "",
+  "type": "module",
+  "exports": {
+    "./client-logger": "./dist/client-logger.js",
+    "./common-logger": "./dist/common-logger.js",
+    "./server-logger": "./dist/server-logger.js"
+  },
+  "typesVersions": {
+    "*": {
+      "client-logger": ["./dist/client-logger.d.ts"],
+      "common-logger": ["./dist/common-logger.d.ts"],
+      "server-logger": ["./dist/server-logger.d.ts"]
+    }
+  },
+  "scripts": {
+    "dev": "rm -rf dist && tsc -w -p tsconfig.prod.json",
+    "build": "rm -rf dist && tsc -p tsconfig.prod.json",
+    "test": "echo \"Error: no test specified\" && exit 0",
+    "lint": "eslint . --ext .ts",
+    "lint:fix": "eslint . --ext .ts --fix"
+  },
+  "keywords": [],
+  "author": "samuele.salvatico@nearform.com",
+  "license": "ISC",
+  "devDependencies": {
+    "@tsconfig/node20": "^20.1.4",
+    "@types/node": "^22.10.2",
+    "typescript": "^5.7.2"
+  },
+  "dependencies": {
+    "next": "^14.2.5",
+    "pino": "^9.5.0",
+    "@ogcio/shared-errors": "^1.0.0"
+  }
+}
