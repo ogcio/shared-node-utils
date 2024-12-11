@@ -12,7 +12,7 @@
 - [ ] **Documentation**
 - [ ] **Other**
 
-### Checklist:
+### Checklist
 
 - [ ] I have added tests that prove my fix is effective or that my feature works
 - [ ] This change might impact the developer experience of others and should be communicated
