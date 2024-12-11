@@ -1,6 +1,6 @@
 {
   "name": "@ogcio/api-auth",
-  "version": "0.0.1",
+  "version": "4.29.0",
   "main": "dist/index.js",
   "type": "module",
   "dependencies": {
