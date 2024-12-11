@@ -1,6 +1,6 @@
 {
   "name": "@ogcio/nextjs-logging-wrapper",
-  "version": "14.2.7",
+  "version": "14.2.8",
   "description": "",
   "type": "module",
   "exports": {
@@ -32,5 +32,9 @@
     "next": "^14.2.5",
     "pino": "^9.5.0",
     "@ogcio/shared-errors": "^1.0.0"
-  }
+  },
+  "files": [
+    "dist",
+    "src"
+  ]
 }
