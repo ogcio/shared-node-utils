@@ -6,6 +6,7 @@ updates:
       - "/packages/fastify-error-handler"
       - "/packages/fastify-logging-wrapper"
       - "/packages/shared-errors"
+      - "/packages/api-auth"
     schedule:
       interval: "weekly"
       time: "23:00" # UTC time
