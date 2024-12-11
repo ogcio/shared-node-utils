@@ -3,9 +3,10 @@
   "compilerOptions": {
     "composite": true,
     "outDir": "dist",
+    "rootDir": "src"
   },
-  "include": ["src", "__tests__"],
+  "include": ["src"],
   "references": [
     { "path": "../shared-errors" }
-  ]
+  ],
 }
