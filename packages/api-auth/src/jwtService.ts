@@ -18,20 +18,8 @@ import {
 const getKmsClient = (() => {
   let kmsClient: KMSClient | null = null;
 
-  return function getKmsClient(): KMSClient {
+  return function getKmsClient(kmsConfig: KMSClientConfig): KMSClient {
     if (kmsClient) return kmsClient;
-
-    const kmsConfig: KMSClientConfig = {
-      region: process.env.AWS_REGION,
-      endpoint: process.env.KMS_ENDPOINT,
-    };
-
-    if (process.env.AWS_ACCESS_KEY_ID && process.env.AWS_SECRET_ACCESS_KEY) {
-      kmsConfig.credentials = {
-        accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-      };
-    }
 
     kmsClient = new KMSClient(kmsConfig);
     return kmsClient;
@@ -56,6 +44,7 @@ async function createSignedJWT(
   payload: Record<string, unknown>,
   keyId: string,
   options: JWTOptions,
+  kmsConfig: KMSClientConfig,
 ) {
   const { audience: aud, issuer: iss } = options;
 
@@ -81,7 +70,7 @@ async function createSignedJWT(
     SigningAlgorithm: "RSASSA_PKCS1_V1_5_SHA_256" as const,
   };
   const command = new SignCommand(input);
-  const signResponse = await getKmsClient().send(command);
+  const signResponse = await getKmsClient(kmsConfig).send(command);
 
   if (!signResponse.Signature) {
     throw new Error("KMS did not return a signature. Signing failed.");
@@ -140,9 +129,12 @@ async function verifyJWT(
  * Retrieves a public key from KMS and returns the JWKS (JSON Web Key Set) for the public key.
  * @param keyId - The key id or alias in KMS.
  */
-async function getJWKS(keyId: string): Promise<{ keys: JWK[] }> {
+async function getJWKS(
+  keyId: string,
+  kmsConfig: KMSClientConfig,
+): Promise<{ keys: JWK[] }> {
   const command = new GetPublicKeyCommand({ KeyId: keyId });
-  const { PublicKey } = await getKmsClient().send(command);
+  const { PublicKey } = await getKmsClient(kmsConfig).send(command);
 
   if (!PublicKey)
     throw new Error("KMS did not return a public key. Retrieval failed.");
