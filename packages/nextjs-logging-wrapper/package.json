@@ -1,18 +1,18 @@
 {
   "name": "@ogcio/nextjs-logging-wrapper",
-  "version": "14.2.5",
+  "version": "14.2.6",
   "description": "",
   "type": "module",
   "exports": {
-    "./client-logger": "./dist/client-logger.js",
-    "./common-logger": "./dist/common-logger.js",
-    "./server-logger": "./dist/server-logger.js"
+    "./client-logger": "./dist/src/client-logger.js",
+    "./common-logger": "./dist/src/common-logger.js",
+    "./server-logger": "./dist/src/server-logger.js"
   },
   "typesVersions": {
     "*": {
-      "client-logger": ["./dist/client-logger.d.ts"],
-      "common-logger": ["./dist/common-logger.d.ts"],
-      "server-logger": ["./dist/server-logger.d.ts"]
+      "client-logger": ["./dist/src/client-logger.d.ts"],
+      "common-logger": ["./dist/src/common-logger.d.ts"],
+      "server-logger": ["./dist/src/server-logger.d.ts"]
     }
   },
   "scripts": {
