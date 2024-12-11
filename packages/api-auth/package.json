@@ -12,8 +12,9 @@
     "jose": "^5.9.6"
   },
   "scripts": {
-    "test": "TAP_RCFILE=tap.yml tap --reporter junit --reporter-file results.xml",
-    "build": "rm -rf dist && tsc -p tsconfig.prod.json"
+    "build": "rm -rf dist tsconfig.prod.tsbuildinfo tsconfig.tsbuildinfo && tsc -p tsconfig.prod.json",
+    "test": "vitest run --coverage --outputFile=results.xml",
+    "prepublishOnly": "npm i && npm run build && npm run test"
   },
   "devDependencies": {
     "@types/node": "22.10.1",
