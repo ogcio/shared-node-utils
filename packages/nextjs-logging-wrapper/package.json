@@ -4,8 +4,9 @@
   "description": "",
   "type": "module",
   "exports": {
-    ".": "./dist/index.js",
-    "./*": "./dist/*.js"
+    "./src/client-logger.ts": "./dist/client-logger.js",
+    "./src/common-logger.ts": "./dist/common-logger.js",
+    "./src/server-logger.ts": "./dist/server-logger.js"
   },
   "scripts": {
     "dev": "rm -rf dist && tsc -w -p tsconfig.prod.json",
