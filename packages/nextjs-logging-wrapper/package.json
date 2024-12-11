@@ -4,9 +4,16 @@
   "description": "",
   "type": "module",
   "exports": {
-    "./src/client-logger.ts": "./dist/client-logger.js",
-    "./src/common-logger.ts": "./dist/common-logger.js",
-    "./src/server-logger.ts": "./dist/server-logger.js"
+    "./client-logger": "./dist/client-logger.js",
+    "./common-logger": "./dist/common-logger.js",
+    "./server-logger": "./dist/server-logger.js"
+  },
+  "typesVersions": {
+    "*": {
+      "client-logger": ["./dist/client-logger.d.ts"],
+      "common-logger": ["./dist/common-logger.d.ts"],
+      "server-logger": ["./dist/server-logger.d.ts"]
+    }
   },
   "scripts": {
     "dev": "rm -rf dist && tsc -w -p tsconfig.prod.json",
