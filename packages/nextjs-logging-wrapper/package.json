@@ -1,6 +1,6 @@
 {
   "name": "@ogcio/nextjs-logging-wrapper",
-  "version": "14.2.8",
+  "version": "14.2.9",
   "description": "",
   "type": "module",
   "exports": {
