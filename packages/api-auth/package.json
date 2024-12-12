@@ -15,9 +15,5 @@
     "build": "rm -rf dist tsconfig.prod.tsbuildinfo tsconfig.tsbuildinfo && tsc -p tsconfig.prod.json",
     "test": "vitest run --coverage --outputFile=results.xml",
     "prepublishOnly": "npm i && npm run build && npm run test"
-  },
-  "devDependencies": {
-    "@types/node": "22.10.1",
-    "typescript": "^5.7.2"
   }
 }

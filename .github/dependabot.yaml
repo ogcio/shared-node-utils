@@ -8,6 +8,7 @@ updates:
       - "/packages/shared-errors"
       - "/packages/api-auth"
       - "/packages/nextjs-logging-wrapper"
+      - "/packages/nextjs-auth"
     schedule:
       interval: "weekly"
       time: "23:00" # UTC time
