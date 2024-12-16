@@ -1,17 +1,24 @@
 {
   "name": "@ogcio/nextjs-auth",
-  "version": "0.0.1",
-  "private": true,
+  "version": "0.0.2",
+  "private": false,
   "exports": {
-    "./*": "./src/*.ts"
+    "./*": "./dist/*.js"
+  },
+  "typesVersions": {
+    "*": {
+      "*": ["./dist/*.d.ts"]
+    }
   },
   "scripts": {
+    "dev": "rm -rf dist && tsc -w -p tsconfig.prod.json",
+    "build": "rm -rf dist tsconfig.prod.tsbuildinfo tsconfig.tsbuildinfo && tsc -p tsconfig.prod.json",
     "test": "echo \"Error: no test specified\" && exit 0",
-    "build": "echo \"Error: no build specified\" && exit 0"
+    "prepublishOnly": "npm i && npm run build"
   },
   "type": "module",
   "dependencies": {
-    "@logto/next": "4.1.0",
+    "@logto/next": "3.5.0",
     "@ogcio/nextjs-logging-wrapper": "^14.2.8",
     "@ogcio/shared-errors": "^1.0.0",
     "http-errors": "^2.0.0",
@@ -26,5 +33,9 @@
     "@types/pg": "^8.11.10",
     "@types/react": "18.3.16",
     "@types/react-dom": "18.3.5"
-  }
+  },
+  "files": [
+    "dist",
+    "src"
+  ]
 }
