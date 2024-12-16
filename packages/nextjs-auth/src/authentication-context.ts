@@ -3,7 +3,7 @@ import { AuthSession, AuthUserScope } from "./auth-session.js";
 import type { PartialAuthSessionContext } from "./types.js";
 
 export interface LogtoParams {
-  logLevel: Level | undefined;
+  logLevel: string | undefined;
   isProductionEnv: boolean;
   logtoEndpoint: string;
   logtoCookieSecret: string;

@@ -1,7 +1,7 @@
 import { getCommonLogger } from "@ogcio/nextjs-logging-wrapper/common-logger";
 import createError from "http-errors";
 import { notFound } from "next/navigation.js";
-import type { Logger } from "pino";
+import type { Level, Logger } from "pino";
 import {
   type LogtoParams,
   getCitizenContext,
@@ -32,6 +32,13 @@ export interface AuthenticationContextConfig {
   appSecret: string;
 }
 
+const isValidLogLevel = (logLevel: string | undefined): logLevel is Level => {
+  return (
+    logLevel !== undefined &&
+    ["fatal", "error", "warn", "info", "debug", "trace"].includes(logLevel)
+  );
+};
+
 export class BaseAuthenticationContext {
   readonly config: AuthenticationContextConfig;
   sharedContext: AuthSessionContext | null = null;
@@ -42,7 +49,11 @@ export class BaseAuthenticationContext {
   constructor(config: AuthenticationContextConfig, logtoParams: LogtoParams) {
     this.config = config;
     this.logtoParams = logtoParams;
-    this.logger = getCommonLogger(this.logtoParams.logLevel);
+    this.logger = getCommonLogger(
+      isValidLogLevel(this.logtoParams.logLevel)
+        ? this.logtoParams.logLevel
+        : undefined,
+    );
   }
 
   async getContext() {
