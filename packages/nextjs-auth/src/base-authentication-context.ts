@@ -1,8 +1,9 @@
 import { getCommonLogger } from "@ogcio/nextjs-logging-wrapper/common-logger";
 import createError from "http-errors";
 import { notFound } from "next/navigation.js";
-import type { Level, Logger } from "pino";
+import type { Logger } from "pino";
 import {
+  type LogtoParams,
   getCitizenContext,
   getCitizenToken,
   getOrgToken,
@@ -31,24 +32,17 @@ export interface AuthenticationContextConfig {
   appSecret: string;
 }
 
-const isValidLogLevel = (logLevel: string | undefined): logLevel is Level => {
-  return (
-    logLevel !== undefined &&
-    ["fatal", "error", "warn", "info", "debug", "trace"].includes(logLevel)
-  );
-};
 export class BaseAuthenticationContext {
   readonly config: AuthenticationContextConfig;
   sharedContext: AuthSessionContext | null = null;
   citizenContext: PartialAuthSessionContext | null = null;
   publicServantContext: PartialAuthSessionContext | null = null;
+  readonly logtoParams: LogtoParams;
   readonly logger: Logger;
-  constructor(config: AuthenticationContextConfig) {
+  constructor(config: AuthenticationContextConfig, logtoParams: LogtoParams) {
     this.config = config;
-    const inputLogLevel = process.env.LOG_LEVEL;
-    this.logger = getCommonLogger(
-      isValidLogLevel(inputLogLevel) ? inputLogLevel : undefined,
-    );
+    this.logtoParams = logtoParams;
+    this.logger = getCommonLogger(this.logtoParams.logLevel);
   }
 
   async getContext() {
@@ -80,7 +74,10 @@ export class BaseAuthenticationContext {
       this.citizenContext =
         this.sharedContext && !this.sharedContext.isPublicServant
           ? this.sharedContext
-          : await getCitizenContext(this.config, this.logger);
+          : await getCitizenContext(
+              { ...this.config, logtoParams: this.logtoParams },
+              this.logger,
+            );
     }
     return this.citizenContext as PartialAuthSessionContext;
   }
@@ -93,6 +90,7 @@ export class BaseAuthenticationContext {
             {
               ...this.config,
               organizationId: await this.getSelectedOrganization(),
+              logtoParams: this.logtoParams,
             },
             this.logger,
           );
@@ -126,15 +124,21 @@ export class BaseAuthenticationContext {
   }
 
   async isPublicServantAuthenticated(): Promise<boolean> {
-    return isPublicServantAuthenticated(this.config, this.logger);
+    return isPublicServantAuthenticated(
+      { ...this.config, logtoParams: this.logtoParams },
+      this.logger,
+    );
   }
 
   async isCitizenAuthenticated(): Promise<boolean> {
-    return isPublicServantAuthenticated(this.config, this.logger);
+    return isPublicServantAuthenticated(
+      { ...this.config, logtoParams: this.logtoParams },
+      this.logger,
+    );
   }
 
   async isAuthenticated(): Promise<boolean> {
-    return isAuthenticated(this.config);
+    return isAuthenticated({ ...this.config, logtoParams: this.logtoParams });
   }
 
   async getOrganizations(): Promise<Record<string, OrganizationData>> {
@@ -181,11 +185,15 @@ export class BaseAuthenticationContext {
   async getToken() {
     if (await this.isPublicServant()) {
       return getOrgToken(
-        this.config,
+        { ...this.config, logtoParams: this.logtoParams },
         await this.getSelectedOrganization(),
         this.logger,
       );
     }
-    return getCitizenToken(this.config, this.logger, this.config.resourceUrl);
+    return getCitizenToken(
+      { ...this.config, logtoParams: this.logtoParams },
+      this.logger,
+      this.config.resourceUrl,
+    );
   }
 }

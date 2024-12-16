@@ -1,11 +1,18 @@
-import type { Logger } from "pino";
+import type { Level, Logger } from "pino";
 import { AuthSession, AuthUserScope } from "./auth-session.js";
 import type { PartialAuthSessionContext } from "./types.js";
 
-export const getBaseLogtoConfig = () => ({
-  cookieSecure: process.env.NODE_ENV === "production",
-  endpoint: process.env.LOGTO_ENDPOINT as string,
-  cookieSecret: process.env.LOGTO_COOKIE_SECRET as string,
+export interface LogtoParams {
+  logLevel: Level | undefined;
+  isProductionEnv: boolean;
+  logtoEndpoint: string;
+  logtoCookieSecret: string;
+}
+
+export const getBaseLogtoConfig = (logtoParams: LogtoParams) => ({
+  cookieSecure: logtoParams.isProductionEnv,
+  endpoint: logtoParams.logtoEndpoint,
+  cookieSecret: logtoParams.logtoCookieSecret,
 });
 
 export const organizationScopes = [
@@ -35,7 +42,7 @@ interface CitizenParameters {
 }
 
 export const getCitizenContext = async (
-  params: CitizenParameters,
+  params: CitizenParameters & { logtoParams: LogtoParams },
   logger: Logger,
 ): Promise<PartialAuthSessionContext> => {
   const citizenAuthConfig = buildCitizenAuthConfig(params);
@@ -78,7 +85,7 @@ export const getCitizenContext = async (
 };
 
 export const getPublicServantContext = async (
-  params: PublicServantParameters,
+  params: PublicServantParameters & { logtoParams: LogtoParams },
   logger: Logger,
 ): Promise<PartialAuthSessionContext> => {
   const authConfig = buildPublicServantAuthConfig(params);
@@ -121,7 +128,7 @@ export const getPublicServantContext = async (
 };
 
 export const isPublicServantAuthenticated = async (
-  params: PublicServantParameters,
+  params: PublicServantParameters & { logtoParams: LogtoParams },
   logger: Logger,
 ): Promise<boolean> => {
   const isUserAuthenticatedAsPublicServant = await AuthSession.isAuthenticated(
@@ -144,12 +151,16 @@ export const isPublicServantAuthenticated = async (
 export const isAuthenticated = async (params: {
   appId: string;
   baseUrl: string;
+  logtoParams: LogtoParams;
 }): Promise<boolean> => {
-  return AuthSession.isAuthenticated({ ...getBaseLogtoConfig(), ...params });
+  return AuthSession.isAuthenticated({
+    ...getBaseLogtoConfig(params.logtoParams),
+    ...params,
+  });
 };
 
 export const isCitizenAuthenticated = async (
-  params: CitizenParameters,
+  params: CitizenParameters & { logtoParams: LogtoParams },
   logger: Logger,
 ): Promise<boolean> => {
   const isUserAuthenticatedAsCitizen = await AuthSession.isAuthenticated(
@@ -175,7 +186,7 @@ export const setSelectedOrganization = (organizationId: string) =>
   AuthSession.setSelectedOrganization(organizationId);
 
 export const getCitizenToken = async (
-  params: CitizenParameters,
+  params: CitizenParameters & { logtoParams: LogtoParams },
   logger: Logger,
   resource?: string,
 ): Promise<string> => {
@@ -207,7 +218,7 @@ export const getCitizenToken = async (
 };
 
 export const getOrgToken = async (
-  params: PublicServantParameters,
+  params: PublicServantParameters & { logtoParams: LogtoParams },
   organizationId: string,
   logger: Logger,
 ): Promise<string> => {
@@ -241,8 +252,10 @@ export const getOrgToken = async (
   }
 };
 
-const buildPublicServantAuthConfig = (params: PublicServantParameters) => ({
-  ...getBaseLogtoConfig(),
+const buildPublicServantAuthConfig = (
+  params: PublicServantParameters & { logtoParams: LogtoParams },
+) => ({
+  ...getBaseLogtoConfig(params.logtoParams),
   baseUrl: params.baseUrl,
   appId: params.appId,
   appSecret: params.appSecret,
@@ -261,8 +274,10 @@ const buildPublicServantContextParameters = (
   loginUrl: params.loginUrl,
 });
 
-const buildCitizenAuthConfig = (params: CitizenParameters) => ({
-  ...getBaseLogtoConfig(),
+const buildCitizenAuthConfig = (
+  params: CitizenParameters & { logtoParams: LogtoParams },
+) => ({
+  ...getBaseLogtoConfig(params.logtoParams),
   baseUrl: params.baseUrl,
   appId: params.appId,
   appSecret: params.appSecret,
