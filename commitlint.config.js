@@ -11,6 +11,7 @@ module.exports = {
         "fastify-logging-wrapper",
         "api-auth",
         "nextjs-logging-wrapper",
+        "nextjs-auth",
       ],
     ],
   },
