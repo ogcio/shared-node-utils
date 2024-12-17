@@ -16,10 +16,16 @@
     "prepublishOnly": "npm i && npm run build && npm run test"
   },
   "keywords": [],
-  "author": {
-    "name": "Samuele Salvatico",
-    "email": "samuele.salvatico@nearform.com"
-  },
+  "authors": [
+    {
+      "name": "Samuele Salvatico",
+      "email": "samuele.salvatico@nearform.com"
+    },
+    {
+      "name": "Matteo La Cognata",
+      "email": "matteo.lacognata@nearform.com"
+    }
+  ],
   "license": "ISC",
   "description": "Group of Node.js utils projects used in the OGCIO projects",
   "devDependencies": {
