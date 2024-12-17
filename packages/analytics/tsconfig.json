@@ -1,0 +1,17 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "types": ["./src/custom.d.ts"],
+    "allowJs": true,
+    "incremental": true,
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "strictNullChecks": true,
+    "outDir": "dist",
+    "rootDir": "src",
+  },
+  "include": ["next-env.d.ts", ".next/types/**/*.ts", "src"],
+  "exclude": ["node_modules", "dist"]
+}
