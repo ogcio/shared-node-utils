@@ -2,3 +2,4 @@ npm run build
 npm run test -w=@ogcio/fastify-error-handler
 npm run test -w=@ogcio/fastify-logging-wrapper
 npm run test -w=@ogcio/api-auth
+npm run test -w=@ogcio/analytics

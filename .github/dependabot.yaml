@@ -9,6 +9,7 @@ updates:
       - "/packages/api-auth"
       - "/packages/nextjs-logging-wrapper"
       - "/packages/nextjs-auth"
+      - "/packages/analytics"
     schedule:
       interval: "weekly"
       time: "23:00" # UTC time

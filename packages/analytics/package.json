@@ -2,12 +2,12 @@
   "name": "@ogcio/analytics",
   "version": "0.0.2",
   "description": "",
+  "type": "module",
   "scripts": {
     "test": "vitest run --coverage --outputFile=results.xml",
     "test:local": "vitest run",
-    "build": "npm run build:clean && npm run build:prepare",
-    "build:clean": "rm -rf dist && rm -f *.tsbuildinfo",
-    "build:prepare": "tsc"
+    "build": "rm -rf dist *.tsbuildinfo && tsc -p tsconfig.prod.json",
+    "prepublishOnly": "npm i && npm run build && npm run test"
   },
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
