@@ -20,9 +20,7 @@ export const useAnalyticsTracker =
           userId,
         })
         .then(() => {
-          client.analytics.setTrackingContext({
-            customDimensions: customDimensions,
-          });
+          client.analytics.setTrackingContext({ customDimensions });
         })
         .catch(() => {
           // TODO: Handle error

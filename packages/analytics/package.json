@@ -3,11 +3,12 @@
   "version": "0.0.2",
   "description": "",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 0",
+    "test": "vitest run --coverage --outputFile=results.xml",
+    "test:local": "vitest run",
     "build": "npm run build:clean && npm run build:prepare",
     "build:clean": "rm -rf dist && rm -f *.tsbuildinfo",
     "build:prepare": "tsc"
-  },  
+  },
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "files": [
@@ -20,9 +21,12 @@
     "react-dom": "^18.3.1"
   },
   "devDependencies": {
+    "@testing-library/react": "^16.1.0",
     "@types/node": "22.10.2",
     "@types/react": "18.3.12",
     "@types/react-dom": "18.3.1",
+    "@vitejs/plugin-react": "^4.3.4",
+    "jsdom": "^25.0.1",
     "typescript": "^5.7.2"
   }
 }
