@@ -6,6 +6,7 @@ interface AnalyticsConfigProps {
   applicationId: string;
   applicationSecret: string;
   logtoOidcEndpoint: string;
+  scopes?: string[];
 }
 
 interface AnalyticsTrackerProps {
@@ -21,4 +22,27 @@ interface AnalyticsTrackerProps {
   };
 }
 
-export type { AnalyticsConfigProps, AnalyticsTrackerProps };
+interface TrackEventProps {
+  event: {
+    category: string;
+    action: string;
+    name?: string;
+    value?: number;
+  };
+  metadataOverride?: {
+    url?: string;
+    userAgent?: string;
+    referrer?: string;
+    language?: string;
+    screenResolution?: string;
+  };
+  contextOverride?: {
+    userId?: string;
+    customDimensions?: {
+      [key: string]: string;
+    };
+  };
+  siteIds?: number[];
+}
+
+export type { AnalyticsConfigProps, AnalyticsTrackerProps, TrackEventProps };

@@ -9,6 +9,7 @@ export const BBClient = ({
   applicationId,
   applicationSecret,
   logtoOidcEndpoint,
+  scopes = DEFAULT_SCOPES,
 }: AnalyticsConfigProps) =>
   getBuildingBlockSDK({
     services: {
@@ -29,7 +30,7 @@ export const BBClient = ({
                 applicationSecret,
                 logtoOidcEndpoint,
                 organizationId,
-                scopes: DEFAULT_SCOPES,
+                scopes,
               },
             },
           },

@@ -1,27 +1,4 @@
-import { type AnalyticsConfigProps, BBClient } from ".";
-
-type TrackEventProps = {
-  event: {
-    category: string;
-    action: string;
-    name?: string;
-    value?: number;
-  };
-  metadataOverride?: {
-    url?: string;
-    userAgent?: string;
-    referrer?: string;
-    language?: string;
-    screenResolution?: string;
-  };
-  contextOverride?: {
-    userId?: string;
-    customDimensions?: {
-      [key: string]: string;
-    };
-  };
-  siteIds?: number[];
-};
+import { type AnalyticsConfigProps, BBClient, type TrackEventProps } from ".";
 
 export const trackEvent =
   (config: AnalyticsConfigProps) =>
