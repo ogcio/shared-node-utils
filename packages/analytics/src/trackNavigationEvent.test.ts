@@ -12,7 +12,7 @@ const mockBBClient = vi.fn().mockReturnValue({
   },
 });
 
-vi.mock(".", () => ({
+vi.mock("./client", () => ({
   BBClient: (config: AnalyticsConfigProps) => mockBBClient(config),
 }));
 

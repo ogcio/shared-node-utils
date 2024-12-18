@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import type { AnalyticsConfigProps, AnalyticsTrackerProps } from ".";
 import { BBClient } from ".";
 
@@ -14,20 +14,23 @@ export const useAnalyticsTracker =
 
     const client = BBClient(config);
 
-    function initAnalytics(userId?: string) {
-      client.analytics
-        .initClientTracker({
-          userId,
-        })
-        .then(() => {
-          client.analytics.setTrackingContext({ customDimensions });
-        })
-        .catch(() => {
-          // TODO: Handle error
-        });
-    }
+    const initAnalytics = useCallback(
+      (userId?: string) => {
+        client.analytics
+          .initClientTracker({
+            userId,
+          })
+          .then(() => {
+            client.analytics.setTrackingContext({ customDimensions });
+          })
+          .catch(() => {
+            // TODO: Handle error
+          });
+      },
+      [client, customDimensions],
+    );
 
-    // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
+    // biome-ignore lint/correctness/useExhaustiveDependencies: Not needed
     useEffect(() => {
       if (isInitialized.current) {
         return;
@@ -37,7 +40,7 @@ export const useAnalyticsTracker =
       initAnalytics(userId);
     }, [userId]);
 
-    // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
+    // biome-ignore lint/correctness/useExhaustiveDependencies: Not needed
     useEffect(() => {
       if (isInitialLoad.current) {
         isInitialLoad.current = false;

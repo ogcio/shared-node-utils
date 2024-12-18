@@ -1,4 +1,9 @@
-import { type AnalyticsConfigProps, BBClient } from ".";
+import {
+  type AnalyticsConfigProps,
+  BBClient,
+  NAVIGATION_EVENT_CATEGORY,
+  NAVIGATION_EVENT_NAME,
+} from ".";
 
 export const trackNavigationEvent =
   (config: AnalyticsConfigProps) =>
@@ -9,8 +14,8 @@ export const trackNavigationEvent =
       .event({
         event: {
           action: pathname,
-          category: "NAVIGATION",
-          name: "Route_Request",
+          category: NAVIGATION_EVENT_CATEGORY,
+          name: NAVIGATION_EVENT_NAME,
           value: 1,
         },
       })
