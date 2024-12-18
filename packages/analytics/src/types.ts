@@ -1,13 +1,6 @@
-interface AnalyticsConfigProps {
-  baseUrl: string;
-  trackingWebsiteId?: string;
-  organizationId: string;
-  dryRun: boolean;
-  applicationId: string;
-  applicationSecret: string;
-  logtoOidcEndpoint: string;
-  scopes?: string[];
-}
+import type { getBuildingBlockSDK } from "@ogcio/building-blocks-sdk";
+
+type AnalyticsClientProps = ReturnType<typeof getBuildingBlockSDK>["analytics"];
 
 interface AnalyticsTrackerProps {
   /**
@@ -45,4 +38,4 @@ interface TrackEventProps {
   siteIds?: number[];
 }
 
-export type { AnalyticsConfigProps, AnalyticsTrackerProps, TrackEventProps };
+export type { AnalyticsClientProps, AnalyticsTrackerProps, TrackEventProps };

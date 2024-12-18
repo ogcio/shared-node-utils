@@ -1,15 +1,14 @@
 import {
-  type AnalyticsConfigProps,
-  BBClient,
+  type AnalyticsClientProps,
   NAVIGATION_EVENT_CATEGORY,
   NAVIGATION_EVENT_NAME,
 } from ".";
 import { trackEvent } from "./trackEvent";
 
 export const trackNavigationEvent =
-  (config: AnalyticsConfigProps) =>
+  (client: AnalyticsClientProps) =>
   ({ pathname }: { pathname: string }) => {
-    trackEvent(config)({
+    trackEvent(client)({
       event: {
         action: pathname,
         category: NAVIGATION_EVENT_CATEGORY,

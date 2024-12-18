@@ -1,11 +1,9 @@
-import { type AnalyticsConfigProps, BBClient, type TrackEventProps } from ".";
+import type { AnalyticsClientProps, TrackEventProps } from ".";
 
 export const trackEvent =
-  (config: AnalyticsConfigProps) =>
+  (client: AnalyticsClientProps) =>
   ({ event, metadataOverride, contextOverride }: TrackEventProps) => {
-    const client = BBClient(config);
-
-    client.analytics.track
+    client.track
       .event({ event, metadataOverride, contextOverride })
       .catch(() => {
         // TODO: Handle error

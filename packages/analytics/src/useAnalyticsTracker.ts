@@ -2,26 +2,23 @@
 
 import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useRef } from "react";
-import type { AnalyticsConfigProps, AnalyticsTrackerProps } from ".";
-import { BBClient } from ".";
+import type { AnalyticsClientProps, AnalyticsTrackerProps } from ".";
 
 export const useAnalyticsTracker =
-  (config: AnalyticsConfigProps) =>
+  (client: AnalyticsClientProps) =>
   ({ userId, customDimensions }: AnalyticsTrackerProps) => {
     const pathname = usePathname();
     const isInitialLoad = useRef(true);
     const isInitialized = useRef(false);
 
-    const client = BBClient(config);
-
     const initAnalytics = useCallback(
       (userId?: string) => {
-        client.analytics
+        client
           .initClientTracker({
             userId,
           })
           .then(() => {
-            client.analytics.setTrackingContext({ customDimensions });
+            client.setTrackingContext({ customDimensions });
           })
           .catch(() => {
             // TODO: Handle error
@@ -47,7 +44,7 @@ export const useAnalyticsTracker =
         return;
       }
 
-      client.analytics.track
+      client.track
         .pageView({
           event: { title: pathname },
         })
