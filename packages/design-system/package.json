@@ -1,6 +1,6 @@
 {
   "name": "@ogcio/design-system",
-  "version": "0.0.2",
+  "version": "0.1.0",
   "description": "OGCIO Design System",
   "type": "module",
   "main": "dist/esm/index.js",
