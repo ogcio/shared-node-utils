@@ -8,7 +8,7 @@ const mockTrackEvent = vi.fn().mockResolvedValue({
 });
 
 const mockClient: AnalyticsClientProps = {
-  // @ts-ignore
+  // @ts-expect-error
   track: {
     event: mockTrackEvent,
     pageView: vi.fn(),

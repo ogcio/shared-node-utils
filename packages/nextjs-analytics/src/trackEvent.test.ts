@@ -8,7 +8,7 @@ const mockTrackEvent = vi.fn().mockResolvedValue({
 });
 
 const mockClient: Partial<AnalyticsClientProps> = {
-  // @ts-ignore
+  // @ts-expect-error
   track: {
     event: mockTrackEvent,
   },
@@ -27,7 +27,7 @@ describe("trackEvent", () => {
       value: 1,
     };
 
-    // @ts-ignore
+    // @ts-expect-error
     trackEvent(mockClient)({ event: testEvent });
 
     expect(mockTrackEvent).toHaveBeenCalledWith({
@@ -39,7 +39,7 @@ describe("trackEvent", () => {
     mockTrackEvent.mockRejectedValueOnce(new Error("Track failed"));
     const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
 
-    // @ts-ignore
+    // @ts-expect-error
     trackEvent(mockClient)({
       event: {
         action: "test-action",
