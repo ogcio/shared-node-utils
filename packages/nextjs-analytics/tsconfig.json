@@ -1,0 +1,13 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "types": ["./src/custom.d.ts"],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "strictNullChecks": true,
+    "outDir": "dist",
+    "rootDir": "src",
+  },
+  "include": ["src"],
+}
