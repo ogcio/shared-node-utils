@@ -1,17 +1,11 @@
 import { getBuildingBlockSDK, getM2MTokenFn } from "@ogcio/building-blocks-sdk";
-import {
-  type AnalyticsConfigProps,
-  DEFAULT_ORGANIZATION_ID,
-  DEFAULT_SCOPES,
-  SERVICE_NAME,
-} from ".";
+import type { AnalyticsConfigProps } from ".";
 
 export const BBClient = ({
   baseUrl,
   trackingWebsiteId,
   dryRun,
-  organizationId = DEFAULT_ORGANIZATION_ID,
-  scopes = DEFAULT_SCOPES,
+  organizationId,
   ...getOrganizationTokenParams
 }: AnalyticsConfigProps) =>
   getBuildingBlockSDK({
@@ -27,9 +21,8 @@ export const BBClient = ({
       services: {
         analytics: {
           getOrganizationTokenParams: {
-            ...getOrganizationTokenParams,
             organizationId,
-            scopes,
+            ...getOrganizationTokenParams,
           },
         },
       },
