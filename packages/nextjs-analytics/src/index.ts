@@ -1,4 +1,4 @@
-export * from "./useAnalyticsTracker";
+export * from "./AnalyticsTracker";
 export * from "./trackNavigationEvent";
 export * from "./trackEvent";
 export * from "./types";
