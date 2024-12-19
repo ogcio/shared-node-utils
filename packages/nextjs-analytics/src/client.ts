@@ -23,20 +23,15 @@ export const BBClient = ({
         dryRun,
       },
     },
-    getTokenFn: async (serviceName: string) => {
-      if (serviceName === SERVICE_NAME) {
-        return await getM2MTokenFn({
-          services: {
-            analytics: {
-              getOrganizationTokenParams: {
-                ...getOrganizationTokenParams,
-                organizationId,
-                scopes,
-              },
-            },
+    getTokenFn: getM2MTokenFn({
+      services: {
+        analytics: {
+          getOrganizationTokenParams: {
+            ...getOrganizationTokenParams,
+            organizationId,
+            scopes,
           },
-        })(serviceName);
-      }
-      return "";
-    },
+        },
+      },
+    }),
   });
