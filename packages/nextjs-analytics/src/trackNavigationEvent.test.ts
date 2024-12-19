@@ -1,58 +1,41 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { trackEvent } from "./trackEvent";
+import { NAVIGATION_EVENT_CATEGORY, NAVIGATION_EVENT_NAME } from ".";
+import { trackNavigationEvent } from "./trackNavigationEvent";
 import type { AnalyticsClientProps } from "./types";
 
-const mockTrackEvent = vi.fn().mockResolvedValue({
-  message: "success",
-  status: 200,
-});
+const mockTrackEvent = vi.fn();
+
+vi.mock("./trackEvent", () => ({
+  trackEvent: () => mockTrackEvent,
+}));
 
 const mockClient: AnalyticsClientProps = {
   // @ts-expect-error
   track: {
-    event: mockTrackEvent,
+    event: vi.fn(),
     pageView: vi.fn(),
   },
   initClientTracker: vi.fn(),
   setTrackingContext: vi.fn(),
 };
 
-describe("trackEvent", () => {
+describe("trackNavigationEvent", () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  it("should track event with correct parameters", async () => {
-    const testEvent = {
-      action: "test-action",
-      category: "test-category",
-      name: "test-name",
-      value: 1,
-    };
+  it("should track navigation event with correct parameters", () => {
+    const pathname = "/test-path";
 
-    trackEvent(mockClient)({ event: testEvent });
+    trackNavigationEvent(mockClient)({ pathname });
 
     expect(mockTrackEvent).toHaveBeenCalledWith({
-      event: testEvent,
-    });
-  });
-
-  it("should handle tracking errors silently", async () => {
-    mockTrackEvent.mockRejectedValueOnce(new Error("Track failed"));
-    const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
-
-    trackEvent(mockClient)({
       event: {
-        action: "test-action",
-        category: "test-category",
-        name: "test-name",
+        action: pathname,
+        category: NAVIGATION_EVENT_CATEGORY,
+        name: NAVIGATION_EVENT_NAME,
         value: 1,
       },
     });
-
-    await new Promise((resolve) => process.nextTick(resolve));
-
-    expect(consoleSpy).not.toHaveBeenCalled();
-    consoleSpy.mockRestore();
   });
 });
