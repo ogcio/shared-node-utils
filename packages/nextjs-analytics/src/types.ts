@@ -2,18 +2,9 @@ import type { getBuildingBlockSDK } from "@ogcio/building-blocks-sdk";
 
 type AnalyticsClientProps = ReturnType<typeof getBuildingBlockSDK>["analytics"];
 
-interface AnalyticsTrackerProps {
-  /**
-   * The user ID to track.
-   * Ensure that the user ID is unique to the user.
-   * Tracking the UserID should be done in compliance with the GDPR.
-   * @default undefined
-   */
-  userId?: string;
-  customDimensions?: {
-    [x: `dimension${number}`]: string;
-  };
-}
+type AnalyticsTrackerProps = Parameters<
+  AnalyticsClientProps["setTrackingContext"]
+>[0];
 
 interface TrackEventProps {
   event: {
