@@ -1,18 +1,37 @@
 import { getBuildingBlockSDK, getM2MTokenFn } from "@ogcio/building-blocks-sdk";
-import {
-  type AnalyticsConfigProps,
-  DEFAULT_ORGANIZATION_ID,
-  DEFAULT_SCOPES,
-  SERVICE_NAME,
-} from ".";
+import type {
+  GetAccessTokenParams,
+  GetOrganizationTokenParams,
+} from "@ogcio/building-blocks-sdk/dist/types";
+import { type AnalyticsConfigProps, DEFAULT_SCOPES } from ".";
+
+const getM2MTokenForOrganization = (
+  getOrganizationTokenParams: GetOrganizationTokenParams,
+) =>
+  getM2MTokenFn({
+    services: {
+      analytics: {
+        getOrganizationTokenParams,
+      },
+    },
+  });
+
+const getM2MTokenForCitizen = (getAccessTokenParams: GetAccessTokenParams) =>
+  getM2MTokenFn({
+    services: {
+      analytics: {
+        getAccessTokenParams,
+      },
+    },
+  });
 
 export const BBClient = ({
   baseUrl,
   trackingWebsiteId,
   dryRun,
-  organizationId = DEFAULT_ORGANIZATION_ID,
+  organizationId,
   scopes = DEFAULT_SCOPES,
-  ...getOrganizationTokenParams
+  ...getTokenParams
 }: AnalyticsConfigProps) =>
   getBuildingBlockSDK({
     services: {
@@ -23,15 +42,16 @@ export const BBClient = ({
         dryRun,
       },
     },
-    getTokenFn: getM2MTokenFn({
-      services: {
-        analytics: {
-          getOrganizationTokenParams: {
-            ...getOrganizationTokenParams,
-            organizationId,
-            scopes,
-          },
-        },
-      },
-    }),
+    getTokenFn: organizationId
+      ? getM2MTokenForOrganization({
+          organizationId,
+          ...(getTokenParams as Omit<
+            GetOrganizationTokenParams,
+            "organizationId"
+          >),
+        })
+      : getM2MTokenForCitizen({
+          scopes,
+          ...(getTokenParams as GetAccessTokenParams),
+        }),
   });
