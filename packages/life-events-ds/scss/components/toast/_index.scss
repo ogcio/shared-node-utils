@@ -1,0 +1,174 @@
+@include govie-exports("govie/component/toast") {
+  .govie-toast-container {
+    display: flex;
+    position: fixed;
+    top: 0;
+    right: 0;
+    margin: 0;
+    flex-direction: column;
+    gap: 0.5rem;
+    width: 100%;
+    list-style-type: none;
+    max-width: 100vw;
+    @include govie-responsive-padding(4);
+
+    @include govie-media-query($from: tablet) {
+      gap: 1rem;
+      max-width: 28rem;
+    }
+  }
+
+  .govie-toast {
+    display: flex;
+    overflow: hidden;
+    border-radius: 0;
+    border-width: 1px;
+    border-color: govie-colour("light-grey");
+    width: 100%;
+    height: fit-content;
+    background-color: #ffffff;
+    box-shadow:
+      0 10px 15px -3px rgba(0, 0, 0, 0.1),
+      0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  }
+
+  .govie-toast[data-swipe="cancel"] {
+    transform: translateX(0);
+    transition: transform 200ms ease-out;
+  }
+
+  .govie-toast[data-swipe="end"] {
+    animation: govie-swipe-out 100ms ease-out;
+  }
+
+  .govie-toast[data-swipe="move"] {
+    transform: translateX(var(--radix-toast-swipe-move-x));
+    transition-property: none;
+  }
+
+  .govie-toast[data-state="open"] {
+    animation: govie-slide-left-and-fade 150ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .govie-toast[data-state="closed"] {
+    animation: govie-hide 100ms ease-in;
+  }
+
+  .govie-toast-content {
+    display: flex;
+    padding: 1rem;
+    flex: 1 1 0%;
+    gap: 0.75rem;
+    align-items: flex-start;
+  }
+
+  .govie-toast-content-bordered {
+    border-right-width: 1px;
+    border-color: govie-colour("light-grey");
+  }
+
+  .govie-toast-action {
+    display: flex;
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+    flex: 1 1 0%;
+    justify-content: center;
+    align-items: center;
+    @include govie-font($size: 14, $weight: bold);
+    @include govie-text-colour;
+    transition-property: color, background-color, border-color,
+      text-decoration-color, fill, stroke;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 300ms;
+
+    :hover {
+      box-shadow: 0 0 0 $govie-hover-width $govie-hover-colour;
+    }
+  }
+
+  .govie-toast-action-error {
+    color: govie-colour("red");
+  }
+
+  .govie-toast-close-icon {
+    display: flex;
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+    flex: 1 1 0%;
+    justify-content: center;
+    align-items: center;
+    @include govie-font($size: 14);
+    @include govie-text-colour;
+    transition-property: color, background-color, border-color,
+      text-decoration-color, fill, stroke;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 300ms;
+
+    :hover {
+      box-shadow: 0 0 0 $govie-hover-width $govie-hover-colour;
+    }
+  }
+
+  .govie-toast-icon {
+    width: 32px;
+    height: 32px;
+  }
+
+  .govie-toast-icon-success {
+    color: govie-colour("green");
+  }
+
+  .govie-toast-icon-error {
+    color: govie-colour("red");
+  }
+
+  .govie-toast-icon-warning {
+    color: govie-colour("yellow");
+  }
+
+  .govie-toast-icon-info {
+    color: govie-colour("blue");
+  }
+
+  .govie-toast-title {
+    @include govie-font($size: 24, $weight: bold);
+    @include govie-text-colour;
+  }
+
+  .govie-toast-description {
+    @include govie-font($size: 19);
+    @include govie-text-colour;
+  }
+
+  @keyframes govie-slide-left-and-fade {
+    0% {
+      transform: translateX(calc(100% + 4px));
+      opacity: 0;
+    }
+
+    100% {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+
+  @keyframes govie-swipe-out {
+    from {
+      transform: translateX(var(--radix-toast-swipe-end-x));
+    }
+
+    to {
+      transform: translateX(calc(100% + 4px));
+    }
+  }
+
+  @keyframes govie-hide {
+    from {
+      opacity: 1;
+    }
+
+    to {
+      opacity: 0;
+    }
+  }
+}

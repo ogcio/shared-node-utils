@@ -1,0 +1,49 @@
+{
+  "name": "@ogcio/life-events-ds",
+  "version": "0.1.0",
+  "description": "OGCIO Design System for Life Events",
+  "type": "module",
+  "main": "dist/esm/index.js",
+  "module": "dist/esm/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/esm/index.js",
+      "require": "./dist/cjs/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./styles": "./dist/style.css",
+    "./esm/styles": "./dist/esm/index.css",
+    "./cjs/styles": "./dist/cjs/index.css"
+  },  
+  "files": ["dist"],
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 0",
+    "build": "rm -rf dist && rollup -c",
+    "prepublishOnly": "npm i && npm run build"
+  },
+  "author": "",
+  "license": "Unlicense",
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "^25.0.7",
+    "@rollup/plugin-image": "^3.0.3",
+    "@rollup/plugin-node-resolve": "^15.2.3",
+    "@rollup/plugin-replace": "^5.0.5",
+    "@rollup/plugin-terser": "^0.4.4",
+    "@rollup/plugin-typescript": "^11.1.6",
+    "@types/react": "18.3.12",
+    "@types/react-dom": "18.3.1",
+    "postcss": "^8.4.35",
+    "rollup": "^4.9.6",
+    "rollup-plugin-copy": "^3.5.0",
+    "rollup-plugin-dts": "^6.1.0",
+    "rollup-plugin-peer-deps-external": "^2.2.4",
+    "rollup-plugin-postcss": "^4.0.2",
+    "rollup-plugin-scss": "^4.0.0",
+    "sass": "^1.70.0",
+    "typescript": "^5.6.3"
+  },
+  "optionalDependencies": {
+    "@rollup/rollup-linux-x64-gnu": "4.9.6"
+  }
+}
