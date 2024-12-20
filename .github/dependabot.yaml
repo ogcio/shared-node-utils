@@ -9,7 +9,7 @@ updates:
       - "/packages/api-auth"
       - "/packages/nextjs-logging-wrapper"
       - "/packages/nextjs-auth"
-      - "/packages/design-system"
+      - "/packages/life-events-ds"
       - "/packages/nextjs-analytics"
     schedule:
       interval: "weekly"

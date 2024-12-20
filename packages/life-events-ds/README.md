@@ -7,10 +7,10 @@ Goal is to provide the css and progressive enhancement ready react components.
 ## Usage
 
 All sass are bundled into a css file which you import (at the moment) at some global level by
-`import "design-system/dist/style.css";`
+`import "@ogcio/life-events-ds/style.css";`
 
 Icons are available as a react component called `Icon`. The css has to be imported separately by
-`import "design-system/dist/esm/index.css"`
+`import "@ogcio/life-events-ds/esm/index.css"`
 
 Use class names from storybook unless a react component exists.
 
