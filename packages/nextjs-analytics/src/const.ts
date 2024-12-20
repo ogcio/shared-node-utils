@@ -1,11 +1,5 @@
-const DEFAULT_SCOPES = ["analytics:website:tracking"];
-const SERVICE_NAME = "analytics";
 const NAVIGATION_EVENT_CATEGORY = "NAVIGATION";
 const NAVIGATION_EVENT_NAME = "Route_Request";
+const DEFAULT_SCOPES = ["analytics:website:tracking"];
 
-export {
-  DEFAULT_SCOPES,
-  SERVICE_NAME,
-  NAVIGATION_EVENT_CATEGORY,
-  NAVIGATION_EVENT_NAME,
-};
+export { NAVIGATION_EVENT_CATEGORY, NAVIGATION_EVENT_NAME, DEFAULT_SCOPES };

@@ -1,15 +1,15 @@
 "use client";
 
-import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useRef } from "react";
-import type { AnalyticsClientProps, AnalyticsTrackerProps } from ".";
+import type { AnalyticsTrackerProps } from ".";
+import { BBClient } from "./client";
 
-export const useAnalyticsTracker =
-  (client: AnalyticsClientProps) =>
-  ({ userId, customDimensions }: AnalyticsTrackerProps) => {
-    const pathname = usePathname();
+export const AnalyticsTracker =
+  ({ config, pathname, userId, customDimensions }: AnalyticsTrackerProps) => {
     const isInitialLoad = useRef(true);
     const isInitialized = useRef(false);
+
+    const client = BBClient(config).analytics;
 
     const initAnalytics = useCallback(
       (userId?: string) => {
@@ -46,10 +46,12 @@ export const useAnalyticsTracker =
 
       client.track
         .pageView({
-          event: { title: pathname },
+          event: { title: pathname ?? "" },
         })
         .catch(() => {
           // TODO: Handle error
         });
     }, [pathname]);
+
+    return null;
   };
