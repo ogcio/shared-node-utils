@@ -19,7 +19,8 @@
   "files": ["dist"],
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 0",
-    "build": "rm -rf dist && rollup -c"
+    "build": "rm -rf dist && rollup -c",
+    "prepublishOnly": "npm i && npm run build"
   },
   "author": "",
   "license": "Unlicense",
