@@ -19,3 +19,10 @@ updates:
       all-dependencies:
         patterns:
           - "*"
+    ignore:
+      - dependency-name: "@types/react"
+      - dependency-name: "@types/react-dom"
+      - dependency-name: "react"
+      - dependency-name: "react-dom"
+      - dependency-name: "@logto/next"
+      - dependency-name: "next"
