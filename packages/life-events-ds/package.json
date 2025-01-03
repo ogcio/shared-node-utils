@@ -1,9 +1,9 @@
 {
   "name": "@ogcio/life-events-ds",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "OGCIO Design System for Life Events",
   "type": "module",
-  "main": "dist/esm/index.js",
+  "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",
   "types": "dist/index.d.ts",
   "exports": {
