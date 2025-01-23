@@ -169,7 +169,6 @@ const manageHttpError = (
   if (validationErrors) {
     errorResponse.validation = validationErrors;
   }
-  console.log({ errorResponse, errorDetails });
   reply.status(error.statusCode).send(errorResponse);
 };
 
