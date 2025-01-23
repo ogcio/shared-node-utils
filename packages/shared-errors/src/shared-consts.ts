@@ -1,5 +1,5 @@
-import { isNativeError } from "util/types";
 import createError from "http-errors";
+import { isNativeError } from "util/types";
 export enum HttpErrorClasses {
   ServerError = "SERVER_ERROR",
   ValidationError = "VALIDATION_ERROR",
@@ -11,32 +11,38 @@ export enum HttpErrorClasses {
 
 export const parseHttpErrorClass = (
   errorCode: number | undefined,
-): HttpErrorClasses => {
+): { errorClass: HttpErrorClasses; statusCode: number } => {
   if (!errorCode) {
-    return HttpErrorClasses.UnknownError;
+    return { errorClass: HttpErrorClasses.UnknownError, statusCode: 500 };
   }
 
   if (errorCode === 502) {
-    return HttpErrorClasses.GatewayError;
+    return { errorClass: HttpErrorClasses.GatewayError, statusCode: errorCode };
   }
 
   if (errorCode >= 500) {
-    return HttpErrorClasses.ServerError;
+    return { errorClass: HttpErrorClasses.ServerError, statusCode: errorCode };
   }
 
   if (errorCode === 404) {
-    return HttpErrorClasses.NotFoundError;
+    return {
+      errorClass: HttpErrorClasses.NotFoundError,
+      statusCode: errorCode,
+    };
   }
 
   if (errorCode === 422) {
-    return HttpErrorClasses.ValidationError;
+    return {
+      errorClass: HttpErrorClasses.ValidationError,
+      statusCode: errorCode,
+    };
   }
 
   if (errorCode >= 400) {
-    return HttpErrorClasses.RequestError;
+    return { errorClass: HttpErrorClasses.RequestError, statusCode: errorCode };
   }
 
-  return HttpErrorClasses.UnknownError;
+  return { errorClass: HttpErrorClasses.UnknownError, statusCode: 500 };
 };
 
 export const REQUEST_ID_HEADER = "x-life-events-request-id";
