@@ -1,22 +1,22 @@
-import type {
-  FastifyError,
-  FastifyRequest,
-  FastifyInstance,
-  FastifyReply,
-} from "fastify";
-import type { FastifySchemaValidationError } from "fastify/types/schema.js";
+import { type HttpError, httpErrors } from "@fastify/sensible";
 import {
-  setLoggingContext,
-  getLoggingContextError,
   LogMessages,
+  getLoggingContextError,
+  setLoggingContext,
 } from "@ogcio/fastify-logging-wrapper";
 import {
   type HttpErrorClasses,
   type ValidationErrorData,
   parseHttpErrorClass,
 } from "@ogcio/shared-errors";
+import type {
+  FastifyError,
+  FastifyInstance,
+  FastifyReply,
+  FastifyRequest,
+} from "fastify";
+import type { FastifySchemaValidationError } from "fastify/types/schema.js";
 import { isHttpError } from "http-errors";
-import { type HttpError, httpErrors } from "@fastify/sensible";
 
 export interface OutputHttpError {
   code: HttpErrorClasses;
@@ -25,6 +25,7 @@ export interface OutputHttpError {
   name: string;
   validation?: ValidationErrorData[];
   process?: string;
+  statusCode: number;
 }
 
 // The error handler below is the same as the original one in Fastify,
@@ -123,11 +124,14 @@ const getResponseFromFastifyError = (
   error: FastifyError,
   request: FastifyRequest,
 ): OutputHttpError => {
+  const errorDetails = parseHttpErrorClass(error.statusCode);
+
   const output: OutputHttpError = {
-    code: parseHttpErrorClass(error.statusCode),
+    code: errorDetails.errorClass,
     detail: error.message,
     requestId: request.id,
     name: error.name,
+    statusCode: errorDetails.statusCode,
   };
   if (error.validation && error.validation.length > 0) {
     output.validation = getValidationFromFastifyError(
@@ -145,12 +149,14 @@ const manageHttpError = (
 ): void => {
   reply.raw.statusCode = error.statusCode;
   reply.statusCode = error.statusCode;
+  const errorDetails = parseHttpErrorClass(error.statusCode);
   const errorResponse: OutputHttpError = {
-    code: parseHttpErrorClass(error.statusCode),
+    code: errorDetails.errorClass,
     detail: error.message,
     requestId: request.id,
     name: error.name,
     process: error.errorProcess,
+    statusCode: errorDetails.statusCode,
   };
   let validationErrors =
     error.validationErrors && error.validationErrors.length > 0
@@ -163,7 +169,7 @@ const manageHttpError = (
   if (validationErrors) {
     errorResponse.validation = validationErrors;
   }
-
+  console.log({ errorResponse, errorDetails });
   reply.status(error.statusCode).send(errorResponse);
 };
 

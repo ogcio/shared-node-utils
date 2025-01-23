@@ -39,11 +39,15 @@ describe("Error management", () => {
 
         assert.ok(typeof response !== "undefined");
         assert.equal(response?.statusCode, errorProv.expectedStatusCode);
+        const parsedErrorClass = sharedErrors.parseHttpErrorClass(
+          errorProv.expectedStatusCode,
+        );
         assert.deepEqual(response.json(), {
-          code: sharedErrors.parseHttpErrorClass(errorProv.expectedStatusCode),
+          code: parsedErrorClass.errorClass,
           detail: "Failed Correctly!",
           requestId: "req-1",
           name: errorInstance.name,
+          statusCode: parsedErrorClass.statusCode,
         });
       });
     }
@@ -58,11 +62,13 @@ describe("Error management", () => {
 
       assert.ok(typeof response !== "undefined");
       assert.equal(response?.statusCode, 503);
+      const parsedErrorClass = sharedErrors.parseHttpErrorClass(503);
       assert.deepEqual(response.json(), {
-        code: sharedErrors.parseHttpErrorClass(503),
+        code: parsedErrorClass.errorClass,
         detail: "message",
         requestId: "req-1",
         name: new httpErrors[503]("MOCK").name,
+        statusCode: parsedErrorClass.statusCode,
       });
     });
 
@@ -75,14 +81,16 @@ describe("Error management", () => {
 
       assert.ok(typeof response !== "undefined");
       assert.equal(response?.statusCode, 422);
+      const parsedErrorClass = sharedErrors.parseHttpErrorClass(422);
       assert.deepEqual(response.json(), {
-        code: sharedErrors.parseHttpErrorClass(422),
+        code: parsedErrorClass.errorClass,
         detail: "message",
         requestId: "req-1",
         name: new httpErrors[422]("MOCK").name,
         validation: [
           { fieldName: "field", message: "error", validationRule: "equal" },
         ],
+        statusCode: parsedErrorClass.statusCode,
       });
     });
   }

@@ -28,6 +28,7 @@ describe("Error management", () => {
       detail: "error message",
       requestId: "req-1",
       name: "FastifyError",
+      statusCode: 500,
     });
   });
 
@@ -57,6 +58,7 @@ describe("Error management", () => {
           },
         },
       ],
+      statusCode: 422,
     });
   });
 
@@ -75,6 +77,7 @@ describe("Error management", () => {
       detail: "error message",
       requestId: "req-1",
       name: "FastifyError",
+      statusCode: 500,
     });
   });
 
@@ -92,6 +95,7 @@ describe("Error management", () => {
       detail: "Route not found: /this-path-does-not-exist",
       requestId: "req-1",
       name: new httpErrors[404]("TEMP").name,
+      statusCode: 404,
     });
   });
 });
