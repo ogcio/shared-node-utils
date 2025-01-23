@@ -50,22 +50,27 @@ describe("AnalyticsTracker", () => {
       }),
     );
 
-    expect(mockInitClientTracker).toHaveBeenCalledWith({ userId });
+    expect(mockInitClientTracker).toHaveBeenCalledWith();
   });
 
   it("should set tracking context with customDimensions", async () => {
     const customDimensions = { dimension1: "value1" };
+    const userId = "test-user";
 
     renderHook(() =>
       AnalyticsTracker({
         config: validConfig,
         customDimensions,
+        userId,
         pathname: "/test-path",
       }),
     );
 
     await new Promise((resolve) => process.nextTick(resolve));
-    expect(mockSetTrackingContext).toHaveBeenCalledWith({ customDimensions });
+    expect(mockSetTrackingContext).toHaveBeenCalledWith({
+      customDimensions,
+      userId,
+    });
   });
 
   it("should initialize only once", () => {

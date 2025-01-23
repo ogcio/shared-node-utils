@@ -22,7 +22,6 @@ export const AnalyticsTracker = ({
         client.setTrackingContext({ customDimensions, userId });
       } catch {
         // TODO: Handle error
-        console.error("Failed to initialize analytics");
       }
     },
     [client, customDimensions],
