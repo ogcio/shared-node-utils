@@ -4,54 +4,55 @@ import { useCallback, useEffect, useRef } from "react";
 import type { AnalyticsTrackerProps } from ".";
 import { BBClient } from "./client";
 
-export const AnalyticsTracker =
-  ({ config, pathname, userId, customDimensions }: AnalyticsTrackerProps) => {
-    const isInitialLoad = useRef(true);
-    const isInitialized = useRef(false);
+export const AnalyticsTracker = ({
+  config,
+  pathname,
+  userId,
+  customDimensions,
+}: AnalyticsTrackerProps) => {
+  const isInitialLoad = useRef(true);
+  const isInitialized = useRef(false);
 
-    const client = BBClient(config).analytics;
+  const client = BBClient(config).analytics;
 
-    const initAnalytics = useCallback(
-      (userId?: string) => {
-        client
-          .initClientTracker({
-            userId,
-          })
-          .then(() => {
-            client.setTrackingContext({ customDimensions });
-          })
-          .catch(() => {
-            // TODO: Handle error
-          });
-      },
-      [client, customDimensions],
-    );
-
-    // biome-ignore lint/correctness/useExhaustiveDependencies: Not needed
-    useEffect(() => {
-      if (isInitialized.current) {
-        return;
+  const initAnalytics = useCallback(
+    async (userId?: string) => {
+      try {
+        await client.initClientTracker();
+        client.setTrackingContext({ customDimensions, userId });
+      } catch {
+        // TODO: Handle error
+        console.error("Failed to initialize analytics");
       }
-      isInitialized.current = true;
+    },
+    [client, customDimensions],
+  );
 
-      initAnalytics(userId);
-    }, [userId]);
+  // biome-ignore lint/correctness/useExhaustiveDependencies: Not needed
+  useEffect(() => {
+    if (isInitialized.current) {
+      return;
+    }
+    isInitialized.current = true;
 
-    // biome-ignore lint/correctness/useExhaustiveDependencies: Not needed
-    useEffect(() => {
-      if (isInitialLoad.current) {
-        isInitialLoad.current = false;
-        return;
-      }
+    initAnalytics(userId);
+  }, [userId]);
 
-      client.track
-        .pageView({
-          event: { title: pathname ?? "" },
-        })
-        .catch(() => {
-          // TODO: Handle error
-        });
-    }, [pathname]);
+  // biome-ignore lint/correctness/useExhaustiveDependencies: Not needed
+  useEffect(() => {
+    if (isInitialLoad.current) {
+      isInitialLoad.current = false;
+      return;
+    }
 
-    return null;
-  };
+    client.track
+      .pageView({
+        event: { title: pathname ?? "" },
+      })
+      .catch(() => {
+        // TODO: Handle error
+      });
+  }, [pathname]);
+
+  return null;
+};
