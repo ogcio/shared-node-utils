@@ -12,7 +12,7 @@
     "fix:formatting": "biome format --write",
     "check:linting": "biome lint",
     "fix:linting": "biome lint --write",
-    "test": "npm run test -w=@ogcio/fastify-error-handler && npm run test -w=@ogcio/fastify-logging-wrapper && npm run test -w=@ogcio/api-auth",
+    "test": "npm run test -w=@ogcio/fastify-error-handler && npm run test -w=@ogcio/fastify-logging-wrapper && npm run test -w=@ogcio/api-auth && npm run test -w=@ogcio/nextjs-analytics",
     "prepublishOnly": "npm i && npm run build && npm run test"
   },
   "keywords": [],
