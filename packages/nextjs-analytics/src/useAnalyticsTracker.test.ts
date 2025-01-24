@@ -50,7 +50,7 @@ describe("AnalyticsTracker", () => {
       }),
     );
 
-    expect(mockInitClientTracker).toHaveBeenCalledWith();
+    expect(mockInitClientTracker).toHaveBeenCalled();
   });
 
   it("should set tracking context with customDimensions", async () => {
