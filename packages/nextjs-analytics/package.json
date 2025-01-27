@@ -15,17 +15,17 @@
     "dist"
   ],
   "dependencies": {
-    "@ogcio/building-blocks-sdk": "^0.2.0",
+    "@ogcio/building-blocks-sdk": "^0.2.2",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
   },
   "devDependencies": {
-    "@testing-library/react": "^16.1.0",
-    "@types/node": "22.10.2",
+    "@testing-library/react": "^16.2.0",
+    "@types/node": "22.10.10",
     "@types/react": "18.3.12",
     "@types/react-dom": "18.3.1",
     "@vitejs/plugin-react": "^4.3.4",
-    "jsdom": "^25.0.1",
-    "typescript": "^5.7.2"
+    "jsdom": "^26.0.0",
+    "typescript": "^5.7.3"
   }
 }
