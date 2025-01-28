@@ -1,6 +1,6 @@
 {
   "name": "@ogcio/nextjs-auth",
-  "version": "3.5.0",
+  "version": "3.5.1",
   "private": false,
   "exports": {
     "./*": "./dist/*.js"
@@ -19,8 +19,8 @@
   "type": "module",
   "dependencies": {
     "@logto/next": "3.5.0",
-    "@ogcio/nextjs-logging-wrapper": "^14.2.8",
-    "@ogcio/shared-errors": "^1.0.0",
+    "@ogcio/nextjs-logging-wrapper": "^14.2.9",
+    "@ogcio/shared-errors": "^1.1.0",
     "http-errors": "^2.0.0",
     "jose": "^5.9.6",
     "next": "14.2.5",
@@ -30,7 +30,7 @@
   },
   "devDependencies": {
     "@types/http-errors": "2.0.4",
-    "@types/pg": "^8.11.10",
+    "@types/pg": "^8.11.11",
     "@types/react": "18.3.16",
     "@types/react-dom": "18.3.5"
   },
