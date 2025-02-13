@@ -207,4 +207,10 @@ export class BaseAuthenticationContext {
       this.config.resourceUrl,
     );
   }
+
+  async clearContexts() {
+    this.citizenContext = null;
+    this.publicServantContext = null;
+    this.sharedContext = null;
+  }
 }

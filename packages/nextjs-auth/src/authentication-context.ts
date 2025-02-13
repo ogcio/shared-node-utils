@@ -1,4 +1,4 @@
-import type { Level, Logger } from "pino";
+import type { Logger } from "pino";
 import { AuthSession, AuthUserScope } from "./auth-session.js";
 import type { PartialAuthSessionContext } from "./types.js";
 
