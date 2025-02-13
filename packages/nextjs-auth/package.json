@@ -1,6 +1,6 @@
 {
   "name": "@ogcio/nextjs-auth",
-  "version": "3.5.1",
+  "version": "3.5.2",
   "private": false,
   "exports": {
     "./*": "./dist/*.js"
