@@ -2,14 +2,7 @@
   "name": "@ogcio/nextjs-auth",
   "version": "3.5.2",
   "private": false,
-  "exports": {
-    "./*": "./dist/*.js"
-  },
-  "typesVersions": {
-    "*": {
-      "*": ["./dist/*.d.ts"]
-    }
-  },
+  "main": "dist/index.js",
   "scripts": {
     "dev": "rm -rf dist && tsc -w -p tsconfig.prod.json",
     "build": "rm -rf dist tsconfig.prod.tsbuildinfo tsconfig.tsbuildinfo && tsc -p tsconfig.prod.json",
