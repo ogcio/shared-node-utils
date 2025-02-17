@@ -24,17 +24,30 @@ export class UserSessionStore {
     return UserSessionStore.instance;
   }
 
-  public getUserContext(userId: string): UserContext | undefined {
+  public async getUserContext(
+    config: LogtoNextConfig,
+    getContextParameters: GetContextParams,
+  ): Promise<UserContext | undefined> {
+    const userId = await UserContextHandler.loadLoggedUser(
+      config,
+      getContextParameters,
+      false,
+    );
+    if (!userId) {
+      return undefined;
+    }
+
     const instance = this.userContexts.get(userId);
 
     if (!instance) {
-      throw new Error("You have to create one context before asking for it");
+      return undefined;
     }
+
     instance.lastAccessed = Date.now();
     return instance?.context;
   }
 
-  public async createUserInstance(
+  public async createUserContext(
     config: LogtoNextConfig,
     getContextParameters: GetContextParams,
     logger: Logger,

@@ -48,12 +48,6 @@ export class UserContextHandler implements UserContext {
       redirect(loginUrl);
     }
 
-    if (this.organizationId) {
-      SelectedOrganizationHandler.set(this.organizationId, false);
-    } else {
-      SelectedOrganizationHandler.unset();
-    }
-
     try {
       return parseContext(
         context,
@@ -110,5 +104,37 @@ export class UserContextHandler implements UserContext {
     const context = await this.getContext(true);
 
     return context.originalContext?.accessToken;
+  }
+  static async loadLoggedUser(
+    config: LogtoNextConfig,
+    getContextParameters: GetContextParams,
+    redirectToLoginIfNotFound: boolean,
+  ): Promise<string | undefined> {
+    const loginUrl =
+      getContextParameters?.additionalContextParams?.loginUrl ??
+      DEFAULT_LOGIN_PATH;
+    let userId: string | undefined = undefined;
+    try {
+      const loggedContext = await getLogtoContext(
+        config,
+        getContextParameters.logtoContextParams,
+      );
+      const organizationId =
+        getContextParameters.additionalContextParams?.organizationId ??
+        getContextParameters.logtoContextParams?.organizationId;
+      const parsed = parseContext(
+        loggedContext,
+        getContextParameters,
+        organizationId,
+      );
+
+      userId = parsed.user?.id;
+    } catch {}
+
+    if (!userId && redirectToLoginIfNotFound) {
+      redirect(loginUrl);
+    }
+
+    return userId;
   }
 }
