@@ -31,7 +31,6 @@ const getMapFromScope = (scopes: string[]) => {
 };
 
 export const hasPermissions = (
-  _token: string,
   scopes: string[],
   requiredPermissions: string[],
   matchConfig = { method: "OR" },
