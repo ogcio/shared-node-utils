@@ -43,6 +43,15 @@ export class UserSessionStore {
       return undefined;
     }
 
+    const storedOrg = await instance.context.getCurrentOrganization();
+    const storedOrgId = storedOrg?.id;
+    if (
+      storedOrgId !==
+      getContextParameters.additionalContextParams?.organizationId
+    ) {
+      return undefined;
+    }
+
     instance.lastAccessed = Date.now();
     return instance?.context;
   }
@@ -64,7 +73,7 @@ export class UserSessionStore {
     return instance.context;
   }
 
-  public removeUserInstance(userId: string): void {
+  public removeUserContext(userId: string): void {
     this.userContexts.delete(userId);
   }
 
@@ -74,7 +83,7 @@ export class UserSessionStore {
 
     for (const [userId, instance] of this.userContexts.entries()) {
       if (now - instance.lastAccessed > expirationTime) {
-        this.removeUserInstance(userId);
+        this.removeUserContext(userId);
       }
     }
   }

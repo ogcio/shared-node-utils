@@ -12,22 +12,22 @@ import { DEFAULT_ORGANIZATION_ID } from "./types.js";
 function parseOrganizationInfo(
   context: LogtoContext,
   organizationRoles: string[] | null,
-  organizationId?: string,
+  requestedOrganizationId?: string,
 ): AuthSessionOrganizationInfo | undefined {
   if (organizationRoles === null || organizationRoles.length === 0) {
     return undefined;
   }
 
-  if (!organizationId || !context.userInfo?.organization_data) {
+  if (!requestedOrganizationId || !context.userInfo?.organization_data) {
     return undefined;
   }
 
-  if (!context.userInfo?.organizations?.includes(organizationId)) {
+  if (!context.userInfo?.organizations?.includes(requestedOrganizationId)) {
     return undefined;
   }
 
   for (const currentOrg of context.userInfo.organization_data) {
-    if (currentOrg.id === organizationId) {
+    if (currentOrg.id === requestedOrganizationId) {
       return {
         id: currentOrg.id,
         name: currentOrg.name,
@@ -146,11 +146,16 @@ function parseUserInfo(
 export function parseContext(
   context: LogtoContext,
   getContextParameters: GetContextParams,
-  organizationId?: string,
+  previousUserInfo: AuthSessionUserInfo | undefined,
 ): AuthSessionContext {
-  const userInfo = parseUserInfo(context, getContextParameters);
+  const userInfo =
+    previousUserInfo ?? parseUserInfo(context, getContextParameters);
   const orgRoles = parseOrganizationRoles(context);
-  const orgInfo = parseOrganizationInfo(context, orgRoles, organizationId);
+  const orgInfo = parseOrganizationInfo(
+    context,
+    orgRoles,
+    getContextParameters.additionalContextParams?.organizationId,
+  );
   const isPs = isPublicServant(orgRoles, getContextParameters);
   const isInactivePs = isInactivePublicServant(orgRoles);
 

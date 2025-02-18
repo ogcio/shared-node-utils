@@ -1,4 +1,8 @@
-import type { LogtoContext, LogtoNextConfig } from "@logto/next";
+import {
+  type LogtoContext,
+  type LogtoNextConfig,
+  UserScope,
+} from "@logto/next";
 import type { getLogtoContext } from "@logto/next/server-actions";
 
 export const DEFAULT_ORGANIZATION_ID = "ogcio";
@@ -50,7 +54,9 @@ export interface UserContext {
     matchMethod: "OR" | "AND",
   ): Promise<boolean>;
   getContext(): Promise<AuthSessionContext>;
-  getToken(): Promise<string | undefined>;
+  getTokenFromContext(): Promise<string | undefined>;
+  getToken(resource?: string): Promise<string>;
+  getCurrentOrganization(): Promise<OrganizationData | undefined>;
 }
 
 export interface SelectedOrganization {
@@ -71,3 +77,7 @@ export type GetContextParams = {
     organizationId?: string;
   };
 };
+
+export function getBasicOrganizationRoles(): UserScope[] {
+  return [UserScope.Organizations, UserScope.OrganizationRoles];
+}

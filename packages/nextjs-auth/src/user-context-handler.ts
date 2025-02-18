@@ -1,22 +1,29 @@
 import type { LogtoContext, LogtoNextConfig } from "@logto/next";
-import { getLogtoContext } from "@logto/next/server-actions";
+import {
+  getAccessToken,
+  getAccessTokenRSC,
+  getLogtoContext,
+  getOrganizationToken,
+  getOrganizationTokenRSC,
+} from "@logto/next/server-actions";
 import { redirect } from "next/navigation.js";
 import type { Logger } from "pino";
 import { hasPermissions } from "./check-permissions.js";
 import { addInactivePublicServantScope } from "./inactive-public-servant.js";
 import { parseContext } from "./parse-logto-context.js";
-import { SelectedOrganizationHandler } from "./selected-organization-handler.js";
 import {
   type AuthSessionContext,
   type AuthSessionUserInfo,
   DEFAULT_LOGIN_PATH,
   type GetContextParams,
+  type OrganizationData,
   type UserContext,
 } from "./types.js";
 
 export class UserContextHandler implements UserContext {
   readonly config: LogtoNextConfig;
-  readonly organizationId?: string;
+  private organizationId?: string;
+  private userInfo: AuthSessionUserInfo | undefined;
   constructor(
     config: LogtoNextConfig,
     private readonly getContextParameters: GetContextParams,
@@ -24,8 +31,7 @@ export class UserContextHandler implements UserContext {
   ) {
     this.config = addInactivePublicServantScope(config);
     this.organizationId =
-      this.getContextParameters.additionalContextParams?.organizationId ??
-      this.getContextParameters.logtoContextParams?.organizationId;
+      getContextParameters.additionalContextParams?.organizationId;
   }
   async getContext(): Promise<AuthSessionContext>;
   async getContext(addOriginalContext?: boolean): Promise<AuthSessionContext>;
@@ -36,10 +42,11 @@ export class UserContextHandler implements UserContext {
       this.getContextParameters?.additionalContextParams?.loginUrl ??
       DEFAULT_LOGIN_PATH;
     try {
-      context = await getLogtoContext(
-        this.config,
-        this.getContextParameters?.logtoContextParams,
-      );
+      const fetchUserInfo = this.userInfo === undefined;
+      context = await getLogtoContext(this.config, {
+        ...this.getContextParameters?.logtoContextParams,
+        fetchUserInfo,
+      });
     } catch {
       redirect(loginUrl);
     }
@@ -58,7 +65,7 @@ export class UserContextHandler implements UserContext {
             includeOriginalContext,
           },
         },
-        this.organizationId,
+        this.userInfo,
       );
     } catch (err) {
       this.logger.warn({ error: err }, "Cannot parse logto context");
@@ -66,7 +73,12 @@ export class UserContextHandler implements UserContext {
     }
   }
   async getUser(): Promise<AuthSessionUserInfo | undefined> {
-    const context = await this.getContext();
+    if (this.userInfo) {
+      return this.userInfo;
+    }
+    const context = await this.getContext(false);
+
+    this.userInfo = context.user;
 
     return context.user;
   }
@@ -100,10 +112,27 @@ export class UserContextHandler implements UserContext {
 
     return hasPermissions(scopes, permissions, { method: matchMethod });
   }
-  async getToken(): Promise<string | undefined> {
+  async getTokenFromContext(): Promise<string | undefined> {
     const context = await this.getContext(true);
 
     return context.originalContext?.accessToken;
+  }
+  async getToken(resource?: string): Promise<string> {
+    const isCitizen = await this.isCitizen();
+    if (!resource && isCitizen) {
+      throw new Error("As a citizen a resource must be set");
+    }
+    if (resource && (isCitizen || !this.organizationId)) {
+      return getAccessToken(this.config, resource);
+    }
+
+    if (this.organizationId) {
+      return getOrganizationToken(this.config, this.organizationId);
+    }
+
+    throw new Error(
+      "As a public servant one between resource and organization id must be set",
+    );
   }
   static async loadLoggedUser(
     config: LogtoNextConfig,
@@ -119,13 +148,10 @@ export class UserContextHandler implements UserContext {
         config,
         getContextParameters.logtoContextParams,
       );
-      const organizationId =
-        getContextParameters.additionalContextParams?.organizationId ??
-        getContextParameters.logtoContextParams?.organizationId;
       const parsed = parseContext(
         loggedContext,
         getContextParameters,
-        organizationId,
+        undefined,
       );
 
       userId = parsed.user?.id;
@@ -136,5 +162,17 @@ export class UserContextHandler implements UserContext {
     }
 
     return userId;
+  }
+  async getCurrentOrganization(): Promise<OrganizationData | undefined> {
+    if (!this.organizationId) {
+      return undefined;
+    }
+    const context = await this.getContext();
+
+    if (!context.user?.organizationData) {
+      return undefined;
+    }
+
+    return context.user?.organizationData[this.organizationId];
   }
 }
