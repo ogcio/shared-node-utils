@@ -3,31 +3,33 @@ import type { Logger } from "pino";
 import type { GetContextParams, UserContext } from "./types.js";
 import { UserContextHandler } from "./user-context-handler.js";
 
-type UserInstance = {
+export type UserSessionInstance<T> = {
   context: UserContext;
   lastAccessed: number;
+  additionalInstance?: T;
 };
 
-export class UserSessionStore {
-  private static instance: UserSessionStore;
-  private userContexts: Map<string, UserInstance> = new Map();
+export class UserSessionStore<T> {
+  private userContexts: Map<string, UserSessionInstance<T>> = new Map();
   private cleanupInterval: NodeJS.Timeout | null = null;
 
-  private constructor() {
+  constructor() {
     this.cleanupInterval = setInterval(() => this.cleanup(), 1000 * 60 * 30); // 30 minutes
   }
 
-  public static getInstance(): UserSessionStore {
+  private static instance: UserSessionStore<unknown>;
+  public static getInstance<T>(): UserSessionStore<T> {
     if (!UserSessionStore.instance) {
-      UserSessionStore.instance = new UserSessionStore();
+      UserSessionStore.instance =
+        new UserSessionStore<T>() as UserSessionStore<unknown>;
     }
-    return UserSessionStore.instance;
+    return UserSessionStore.instance as UserSessionStore<T>;
   }
 
-  public async getUserContext(
+  public async getUserInstance(
     config: LogtoNextConfig,
     getContextParameters: GetContextParams,
-  ): Promise<UserContext | undefined> {
+  ): Promise<UserSessionInstance<T> | undefined> {
     const userId = await UserContextHandler.loadLoggedUser(
       config,
       getContextParameters,
@@ -53,24 +55,26 @@ export class UserSessionStore {
     }
 
     instance.lastAccessed = Date.now();
-    return instance?.context;
+    return instance;
   }
 
-  public async createUserContext(
+  public async createUserInstance(
     config: LogtoNextConfig,
     getContextParameters: GetContextParams,
     logger: Logger,
-  ): Promise<UserContext> {
-    const instance: UserInstance = {
+    additionalInstanceToStore?: T,
+  ): Promise<UserSessionInstance<T>> {
+    const instance: UserSessionInstance<T> = {
       context: new UserContextHandler(config, getContextParameters, logger),
       lastAccessed: Date.now(),
+      additionalInstance: additionalInstanceToStore,
     };
     const user = await instance.context.getUser();
     if (!user) {
       throw new Error("Cannot get context with the requested config");
     }
     this.userContexts.set(user.id, instance);
-    return instance.context;
+    return instance;
   }
 
   public removeUserContext(userId: string): void {

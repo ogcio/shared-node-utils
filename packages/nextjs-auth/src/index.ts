@@ -1,6 +1,6 @@
 export { SelectedOrganizationHandler } from "./selected-organization-handler.js";
 export { AuthSessionHandler } from "./auth-session-handler.js";
-export { UserSessionStore } from "./user-session-store.js";
+export { UserSessionStore, UserSessionInstance } from "./user-session-store.js";
 export {
   AuthSessionContext,
   AuthSessionUserInfo,
