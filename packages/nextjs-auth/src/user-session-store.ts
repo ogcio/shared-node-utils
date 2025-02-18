@@ -45,6 +45,11 @@ export class UserSessionStore<T> {
       return undefined;
     }
 
+    if (await instance.context.isCitizen()) {
+      instance.lastAccessed = Date.now();
+      return instance;
+    }
+
     const storedOrg = await instance.context.getCurrentOrganization();
     const storedOrgId = storedOrg?.id;
     if (
