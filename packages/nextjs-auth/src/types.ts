@@ -44,7 +44,7 @@ export type AuthSessionContext = {
 };
 
 export interface UserContext {
-  getUser(): Promise<AuthSessionUserInfo | undefined>;
+  getUser(): Promise<AuthSessionUserInfo>;
   isAuthenticated(): Promise<boolean>;
   isPublicServant(): Promise<boolean>;
   isInactivePublicServant(): Promise<boolean>;
