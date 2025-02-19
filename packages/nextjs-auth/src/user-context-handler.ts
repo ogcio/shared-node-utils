@@ -1,16 +1,14 @@
 import type { LogtoContext, LogtoNextConfig } from "@logto/next";
 import {
   getAccessToken,
-  getAccessTokenRSC,
   getLogtoContext,
   getOrganizationToken,
-  getOrganizationTokenRSC,
 } from "@logto/next/server-actions";
 import { redirect } from "next/navigation.js";
 import type { Logger } from "pino";
 import { hasPermissions } from "./check-permissions.js";
 import { addInactivePublicServantScope } from "./inactive-public-servant.js";
-import { parseContext } from "./parse-logto-context.js";
+import { parseContext, parseUserInfo } from "./parse-logto-context.js";
 import {
   type AuthSessionContext,
   type AuthSessionUserInfo,
@@ -24,6 +22,7 @@ export class UserContextHandler implements UserContext {
   readonly config: LogtoNextConfig;
   private organizationId?: string;
   private userInfo: AuthSessionUserInfo | undefined;
+  private loginUrl: string;
   constructor(
     config: LogtoNextConfig,
     private readonly getContextParameters: GetContextParams,
@@ -32,15 +31,12 @@ export class UserContextHandler implements UserContext {
     this.config = addInactivePublicServantScope(config);
     this.organizationId =
       getContextParameters.additionalContextParams?.organizationId;
-  }
-  async getContext(): Promise<AuthSessionContext>;
-  async getContext(addOriginalContext?: boolean): Promise<AuthSessionContext>;
-  async getContext(addOriginalContext?: boolean): Promise<AuthSessionContext> {
-    const includeOriginalContext = addOriginalContext ?? false;
-    let context: LogtoContext | undefined;
-    const loginUrl =
+    this.loginUrl =
       this.getContextParameters?.additionalContextParams?.loginUrl ??
       DEFAULT_LOGIN_PATH;
+  }
+  private async getOriginalContext(): Promise<LogtoContext> {
+    let context: LogtoContext | undefined;
     try {
       const fetchUserInfo = this.userInfo === undefined;
       context = await getLogtoContext(this.config, {
@@ -48,12 +44,20 @@ export class UserContextHandler implements UserContext {
         fetchUserInfo,
       });
     } catch {
-      redirect(loginUrl);
+      redirect(this.loginUrl);
     }
 
     if (!context.isAuthenticated) {
-      redirect(loginUrl);
+      redirect(this.loginUrl);
     }
+
+    return context;
+  }
+  async getContext(): Promise<AuthSessionContext>;
+  async getContext(addOriginalContext?: boolean): Promise<AuthSessionContext>;
+  async getContext(addOriginalContext?: boolean): Promise<AuthSessionContext> {
+    const includeOriginalContext = addOriginalContext ?? false;
+    const context: LogtoContext = await this.getOriginalContext();
 
     try {
       return parseContext(
@@ -69,23 +73,23 @@ export class UserContextHandler implements UserContext {
       );
     } catch (err) {
       this.logger.warn({ error: err }, "Cannot parse logto context");
-      redirect(loginUrl);
+      redirect(this.loginUrl);
     }
   }
   async getUser(): Promise<AuthSessionUserInfo | undefined> {
     if (this.userInfo) {
       return this.userInfo;
     }
-    const context = await this.getContext(false);
+    const context = await this.getOriginalContext();
 
-    this.userInfo = context.user;
+    this.userInfo = parseUserInfo(context, this.getContextParameters);
 
-    return context.user;
+    return this.userInfo;
   }
   async isAuthenticated(): Promise<boolean> {
-    const context = await this.getContext(true);
+    const context = await this.getOriginalContext();
 
-    return context.originalContext?.isAuthenticated ?? false;
+    return context.isAuthenticated ?? false;
   }
   async isPublicServant(): Promise<boolean> {
     const context = await this.getContext();
@@ -106,16 +110,16 @@ export class UserContextHandler implements UserContext {
     permissions: string[],
     matchMethod: "OR" | "AND" = "OR",
   ): Promise<boolean> {
-    const context = await this.getContext(true);
+    const context = await this.getOriginalContext();
 
-    const scopes = context.originalContext?.scopes ?? [];
+    const scopes = context.scopes ?? [];
 
     return hasPermissions(scopes, permissions, { method: matchMethod });
   }
   async getTokenFromContext(): Promise<string | undefined> {
-    const context = await this.getContext(true);
+    const context = await this.getOriginalContext();
 
-    return context.originalContext?.accessToken;
+    return context.accessToken;
   }
   async getToken(resource?: string): Promise<string> {
     const isCitizen = await this.isCitizen();
@@ -148,13 +152,9 @@ export class UserContextHandler implements UserContext {
         config,
         getContextParameters.logtoContextParams,
       );
-      const parsed = parseContext(
-        loggedContext,
-        getContextParameters,
-        undefined,
-      );
+      const parsed = parseUserInfo(loggedContext, getContextParameters);
 
-      userId = parsed.user?.id;
+      userId = parsed?.id;
     } catch {}
 
     if (!userId && redirectToLoginIfNotFound) {
@@ -173,6 +173,6 @@ export class UserContextHandler implements UserContext {
       return undefined;
     }
 
-    return context.user?.organizationData[this.organizationId];
+    return context.user.organizationData[this.organizationId];
   }
 }

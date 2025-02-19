@@ -9,7 +9,7 @@ import type {
 } from "./types.js";
 import { DEFAULT_ORGANIZATION_ID } from "./types.js";
 
-function parseOrganizationInfo(
+export function parseOrganizationInfo(
   context: LogtoContext,
   organizationRoles: string[] | null,
   requestedOrganizationId?: string,
@@ -39,7 +39,9 @@ function parseOrganizationInfo(
   return undefined;
 }
 
-const parseOrganizationRoles = (context: LogtoContext): string[] | null => {
+export const parseOrganizationRoles = (
+  context: LogtoContext,
+): string[] | null => {
   let organizationRoles: Set<string> | null = null;
 
   if (context.claims && Array.isArray(context.claims.organization_roles)) {
@@ -77,7 +79,7 @@ function isPublicServant(
   });
 }
 
-function parseUserInfo(
+export function parseUserInfo(
   context: LogtoContext,
   getContextParameters: GetContextParams,
 ): AuthSessionUserInfo | undefined {
