@@ -76,13 +76,16 @@ export class UserContextHandler implements UserContext {
       redirect(this.loginUrl);
     }
   }
-  async getUser(): Promise<AuthSessionUserInfo | undefined> {
+  async getUser(): Promise<AuthSessionUserInfo> {
     if (this.userInfo) {
       return this.userInfo;
     }
     const context = await this.getOriginalContext();
 
     this.userInfo = parseUserInfo(context, this.getContextParameters);
+    if (!this.userInfo) {
+      throw new Error("Can't extract user data");
+    }
 
     return this.userInfo;
   }
