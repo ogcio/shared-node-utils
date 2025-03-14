@@ -1,0 +1,32 @@
+{
+  "name": "@ogcio/fastify-o11y-plugin",
+  "version": "0.0.1",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "type": "module",
+  "scripts": {
+    "build": "rm -rf dist tsconfig.prod.tsbuildinfo tsconfig.tsbuildinfo && tsc -p tsconfig.prod.json",
+    "test": "vitest run --coverage --outputFile=results.xml",
+    "prepublishOnly": "npm i && npm run build && npm run test"
+  },
+  "keywords": [],
+  "author": {
+    "name": "Andrea Bozzelli",
+    "email": "andrea.bozzelli@nearform.com"
+  },
+  "license": "ISC",
+  "description": "Custom fastify plugin for OGCIO Observability",
+  "dependencies": {
+    "fastify-plugin": "^5.0.1"
+  },
+  "peerDependencies": {
+    "@ogcio/o11y-sdk-node": ">=0.1.0-beta.8",
+    "fastify": ">=5.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ogcio/shared-node-utils.git",
+    "directory": "packages/fastify-o11y-plugin"
+  },
+  "homepage": "https://github.com/ogcio/shared-node-utils/tree/main/packages/fastify-o11y-plugin#readme"
+}
