@@ -13,10 +13,7 @@ export type OrganizationData = {
   description: string | null;
 };
 export type AuthSessionUserInfo = {
-  name: string | null;
-  username: string | null;
   id: string;
-  email: string | null;
   organizationData?: Record<string, OrganizationData>;
 };
 

@@ -137,10 +137,7 @@ export function parseUserInfo(
   );
 
   return {
-    name,
-    username,
     id,
-    email,
     organizationData,
   };
 }

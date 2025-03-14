@@ -140,31 +140,6 @@ export class UserContextHandler implements UserContext {
       "As a public servant one between resource and organization id must be set",
     );
   }
-  static async loadLoggedUser(
-    config: LogtoNextConfig,
-    getContextParameters: GetContextParams,
-    redirectToLoginIfNotFound: boolean,
-  ): Promise<string | undefined> {
-    const loginUrl =
-      getContextParameters?.additionalContextParams?.loginUrl ??
-      DEFAULT_LOGIN_PATH;
-    let userId: string | undefined = undefined;
-    try {
-      const loggedContext = await getLogtoContext(
-        config,
-        getContextParameters.logtoContextParams,
-      );
-      const parsed = parseUserInfo(loggedContext, getContextParameters);
-
-      userId = parsed?.id;
-    } catch {}
-
-    if (!userId && redirectToLoginIfNotFound) {
-      redirect(loginUrl);
-    }
-
-    return userId;
-  }
   /**
    * Use this method carefully
    * cause it runs a network request against Logto
