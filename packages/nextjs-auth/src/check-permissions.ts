@@ -1,6 +1,6 @@
 type ScopeMap = Map<string, ScopeMap | boolean>;
 
-const getMapFromScope = (scopes: string[]) => {
+function getMapFromScope(scopes: string[]): ScopeMap {
   return scopes.reduce<ScopeMap>((acc, scope) => {
     const subScope = scope.split(":");
     let current: ScopeMap | boolean | undefined = acc;
@@ -28,24 +28,22 @@ const getMapFromScope = (scopes: string[]) => {
 
     return acc;
   }, new Map());
-};
+}
 
-export const hasPermissions = (
+export function hasPermissions(
   scopes: string[],
   requiredPermissions: string[],
-  matchConfig = { method: "OR" },
-): boolean => {
+): boolean {
   const scopesMap = getMapFromScope(scopes);
 
-  const grantAccess =
-    matchConfig.method === "AND"
-      ? requiredPermissions.every((p) => validatePermission(p, scopesMap))
-      : requiredPermissions.some((p) => validatePermission(p, scopesMap));
+  const grantAccess = requiredPermissions.some((p) =>
+    validatePermission(p, scopesMap),
+  );
 
   return grantAccess;
-};
+}
 
-const validatePermission = (permission: string, scope: ScopeMap) => {
+function validatePermission(permission: string, scope: ScopeMap): boolean {
   const parts = permission.split(":");
 
   let current: ScopeMap | boolean | undefined = scope;
@@ -61,4 +59,6 @@ const validatePermission = (permission: string, scope: ScopeMap) => {
       return false;
     }
   }
-};
+
+  return false;
+}

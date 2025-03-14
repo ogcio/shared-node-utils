@@ -9,14 +9,14 @@ import type { Logger } from "pino";
 import { hasPermissions } from "./check-permissions.js";
 import { addInactivePublicServantScope } from "./inactive-public-servant.js";
 import { parseContext, parseUserInfo } from "./parse-logto-context.js";
-import {
-  type AuthSessionContext,
-  type AuthSessionUserInfo,
-  DEFAULT_LOGIN_PATH,
-  type GetContextParams,
-  type OrganizationData,
-  type UserContext,
+import type {
+  AuthSessionContext,
+  AuthSessionUserInfo,
+  GetContextParams,
+  OrganizationData,
+  UserContext,
 } from "./types.js";
+import { DEFAULT_LOGIN_PATH } from "./utils/constants.js";
 
 export class UserContextHandler implements UserContext {
   readonly config: LogtoNextConfig;
@@ -113,7 +113,7 @@ export class UserContextHandler implements UserContext {
 
     const scopes = context.scopes ?? [];
 
-    return hasPermissions(scopes, permissions, { method: "OR" });
+    return hasPermissions(scopes, permissions);
   }
   /**
    * @returns The token got from the current context,

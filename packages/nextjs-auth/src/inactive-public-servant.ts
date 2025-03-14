@@ -1,9 +1,9 @@
 import type { LogtoNextConfig } from "@logto/next";
+import {
+  INACTIVE_PUBLIC_SERVANT_ORG_ROLE,
+  INACTIVE_PUBLIC_SERVANT_SCOPE,
+} from "./utils/constants.js";
 import { deepClone } from "./utils/deep-clone.js";
-
-export const INACTIVE_PUBLIC_SERVANT_SCOPE = "bb:public-servant.inactive:*";
-export const INACTIVE_PUBLIC_SERVANT_ORG_ROLE =
-  "inactive-ps-org:Inactive Public Servant";
 
 export function addInactivePublicServantScope(
   config: LogtoNextConfig,

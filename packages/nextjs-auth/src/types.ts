@@ -60,8 +60,6 @@ export interface SelectedOrganization {
   isSet(): boolean;
 }
 
-export const DEFAULT_LOGIN_PATH = "/login";
-
 export type GetContextParams = {
   logtoContextParams?: Parameters<typeof getLogtoContext>[1];
   additionalContextParams?: {

@@ -38,9 +38,7 @@ export function parseOrganizationInfo(
   return undefined;
 }
 
-export const parseOrganizationRoles = (
-  context: LogtoContext,
-): string[] | null => {
+export function parseOrganizationRoles(context: LogtoContext): string[] | null {
   const organizationRoles: string[] = [];
 
   if (context.claims && Array.isArray(context.claims.organization_roles)) {
@@ -58,7 +56,7 @@ export const parseOrganizationRoles = (
   const uniqueValues = new Set<string>(organizationRoles);
 
   return Array.from(uniqueValues);
-};
+}
 
 function isPublicServant(
   orgRoles: string[] | null,

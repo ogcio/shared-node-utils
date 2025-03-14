@@ -1,7 +1,6 @@
 import { cookies } from "next/headers.js";
 import type { SelectedOrganization } from "./types.js";
-
-const SELECTED_ORG_COOKIE = "bb-selected-org-id";
+import { SELECTED_ORG_COOKIE } from "./utils/constants.js";
 
 export const SelectedOrganizationHandler: SelectedOrganization = {
   set(organizationId: string, secure: boolean, overwrite = false): void {
