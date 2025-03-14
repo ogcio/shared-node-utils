@@ -6,5 +6,4 @@ export {
   AuthSessionUserInfo,
   AuthSessionOrganizationInfo,
   getBasicOrganizationRoles,
-  DEFAULT_ORGANIZATION_ID,
 } from "./types.js";

@@ -7,7 +7,6 @@ import type {
   GetContextParams,
   OrganizationData,
 } from "./types.js";
-import { DEFAULT_ORGANIZATION_ID } from "./types.js";
 
 export function parseOrganizationInfo(
   context: LogtoContext,
@@ -106,19 +105,8 @@ export function parseUserInfo(
     return undefined;
   }
 
-  const organizations = (context.userInfo?.organization_data ?? [])
-    .sort((orgA, orgB) => {
-      if (orgA.id === DEFAULT_ORGANIZATION_ID) {
-        return -1;
-      }
-
-      if (orgB.id === DEFAULT_ORGANIZATION_ID) {
-        return 1;
-      }
-
-      return orgA.name.localeCompare(orgB.name);
-    })
-    .filter((org) => {
+  const organizations = (context.userInfo?.organization_data ?? []).filter(
+    (org) => {
       return (
         getContextParameters.additionalContextParams
           ?.publicServantExpectedRoles ?? []
@@ -126,7 +114,8 @@ export function parseUserInfo(
         const orgPSRole = `${org.id}:${role}`;
         return context.userInfo?.organization_roles?.includes(orgPSRole);
       });
-    });
+    },
+  );
 
   const organizationData = organizations.reduce(
     (acc: Record<string, OrganizationData>, current) => {

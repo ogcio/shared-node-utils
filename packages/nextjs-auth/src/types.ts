@@ -5,8 +5,6 @@ import {
 } from "@logto/next";
 import type { getLogtoContext } from "@logto/next/server-actions";
 
-export const DEFAULT_ORGANIZATION_ID = "ogcio";
-
 export type OrganizationData = {
   id: string;
   name: string;
