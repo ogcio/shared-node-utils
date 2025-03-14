@@ -90,13 +90,24 @@ export class UserContextHandler implements UserContext {
       this.logger.warn({ error: err }, "Cannot parse logto context");
       redirect(this.loginUrl);
     }
-
-    LifeEventsAuthCookies.set({
-      name: AuthCookieNames.LifeEventsAuthContext,
-      value: JSON.stringify(parsed),
-      secure: this.cookieSecure,
-    });
-
+    try {
+      LifeEventsAuthCookies.set({
+        name: AuthCookieNames.LifeEventsAuthContext,
+        value: JSON.stringify(parsed),
+        secure: this.cookieSecure,
+      });
+    } catch (e) {
+      const errorMessage = e as Record<string, unknown>;
+      if (
+        !("message" in errorMessage) ||
+        !(
+          typeof errorMessage.message === "string" &&
+          errorMessage.message.startsWith("Cookies can only be modified")
+        )
+      ) {
+        throw e;
+      }
+    }
     return parsed;
   }
   async getUser(): Promise<AuthSessionUserInfo> {
@@ -112,13 +123,24 @@ export class UserContextHandler implements UserContext {
     if (!parsed) {
       throw new Error("Can't extract user data");
     }
-
-    LifeEventsAuthCookies.set({
-      name: AuthCookieNames.LifeEventsUserInfo,
-      value: JSON.stringify(parsed),
-      secure: this.cookieSecure,
-    });
-
+    try {
+      LifeEventsAuthCookies.set({
+        name: AuthCookieNames.LifeEventsUserInfo,
+        value: JSON.stringify(parsed),
+        secure: this.cookieSecure,
+      });
+    } catch (e) {
+      const errorMessage = e as Record<string, unknown>;
+      if (
+        !("message" in errorMessage) ||
+        !(
+          typeof errorMessage.message === "string" &&
+          errorMessage.message.startsWith("Cookies can only be modified")
+        )
+      ) {
+        throw e;
+      }
+    }
     return parsed;
   }
   async isAuthenticated(): Promise<boolean> {
