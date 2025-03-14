@@ -108,15 +108,12 @@ export class UserContextHandler implements UserContext {
 
     return context.isInactivePublicServant;
   }
-  async hasPermissions(
-    permissions: string[],
-    matchMethod: "OR" | "AND" = "OR",
-  ): Promise<boolean> {
+  async hasPermissions(permissions: string[]): Promise<boolean> {
     const context = await this.getOriginalContext();
 
     const scopes = context.scopes ?? [];
 
-    return hasPermissions(scopes, permissions, { method: matchMethod });
+    return hasPermissions(scopes, permissions, { method: "OR" });
   }
   async getTokenFromContext(): Promise<string | undefined> {
     const context = await this.getOriginalContext();
