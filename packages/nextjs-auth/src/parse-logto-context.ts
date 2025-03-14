@@ -1,4 +1,4 @@
-import type { LogtoContext } from "@logto/next";
+import type { LogtoContext, UserInfoResponse } from "@logto/next";
 import { isInactivePublicServant } from "./inactive-public-servant.js";
 import type {
   AuthSessionContext,
@@ -8,16 +8,22 @@ import type {
   OrganizationData,
 } from "./types.js";
 
+/**
+ * @param context The context got from Logto
+ * @param organizationRoles The organization roles extracted from the context
+ * @param requestedOrganizationId The organization id to return data for
+ * @returns The details of the requeste organization, if available
+ */
 export function parseOrganizationInfo(
   context: LogtoContext,
   organizationRoles: string[] | null,
-  requestedOrganizationId?: string,
+  requestedOrganizationId: string,
 ): AuthSessionOrganizationInfo | undefined {
   if (organizationRoles === null || organizationRoles.length === 0) {
     return undefined;
   }
 
-  if (!requestedOrganizationId || !context.userInfo?.organization_data) {
+  if (!context.userInfo?.organization_data) {
     return undefined;
   }
 
@@ -38,6 +44,10 @@ export function parseOrganizationInfo(
   return undefined;
 }
 
+/**
+ * @param context The context got from Logto
+ * @returns The list of roles for the current org, if any
+ */
 export function parseOrganizationRoles(context: LogtoContext): string[] | null {
   const organizationRoles: string[] = [];
 
@@ -75,8 +85,14 @@ function isPublicServant(
   });
 }
 
+/**
+ *
+ * @param context The context got from Logto, with required userInfo
+ * @param getContextParameters The parameters used to retrieve context from Logto
+ * @returns The parsed user info from Logto
+ */
 export function parseUserInfo(
-  context: LogtoContext,
+  context: LogtoContext & { userInfo: UserInfoResponse },
   getContextParameters: GetContextParams,
 ): AuthSessionUserInfo | undefined {
   let name: string | null = null;
@@ -84,18 +100,16 @@ export function parseUserInfo(
   let id: string | null = null;
   let email: string | null = null;
 
+  name = name ?? context.userInfo.name ?? null;
+  username = username ?? context.userInfo.username ?? null;
+  id = context.userInfo.sub;
+  email = email ?? context.userInfo.email ?? null;
+
   if (context.claims) {
     name = context.claims.name ?? null;
     username = context.claims.username ?? null;
     id = context.claims.sub;
     email = context.claims.email ?? null;
-  }
-
-  if (context.userInfo) {
-    name = name ?? context.userInfo.name ?? null;
-    username = username ?? context.userInfo.username ?? null;
-    id = context.userInfo.sub;
-    email = email ?? context.userInfo.email ?? null;
   }
 
   if (id === null || (name === null && username === null && email === null)) {
@@ -128,16 +142,24 @@ export function parseUserInfo(
   };
 }
 
+/**
+ *
+ * @param context The context got from Logto
+ * @param getContextParameters The parameters used to retrieve context from Logto
+ * @returns The parsed context
+ */
 export function parseContext(
   context: LogtoContext,
   getContextParameters: GetContextParams,
 ): AuthSessionContext {
   const orgRoles = parseOrganizationRoles(context);
-  const orgInfo = parseOrganizationInfo(
-    context,
-    orgRoles,
-    getContextParameters.additionalContextParams?.organizationId,
-  );
+  const orgInfo = getContextParameters.additionalContextParams?.organizationId
+    ? parseOrganizationInfo(
+        context,
+        orgRoles,
+        getContextParameters.additionalContextParams.organizationId,
+      )
+    : undefined;
   const isPs = isPublicServant(orgRoles, getContextParameters);
   const isInactivePs = isInactivePublicServant(orgRoles);
 

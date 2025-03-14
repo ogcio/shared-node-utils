@@ -5,6 +5,14 @@ import {
 } from "./utils/constants.js";
 import { deepClone } from "./utils/deep-clone.js";
 
+/**
+ * When a public servant is initially onboarded
+ * the inactive role is assigned, with this method
+ * we aim to request also scopes for that role
+ *
+ * @param config The current Logto config used to communicate with Logto
+ * @returns
+ */
 export function addInactivePublicServantScope(
   config: LogtoNextConfig,
 ): LogtoNextConfig {

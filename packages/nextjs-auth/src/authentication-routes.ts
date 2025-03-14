@@ -4,6 +4,10 @@ import { addInactivePublicServantScope } from "./inactive-public-servant.js";
 // import { SelectedOrganizationHandler } from "./selected-organization-handler.js";
 import type { AuthSession } from "./types.js";
 
+/**
+ * This object wraps the logto routes managing the
+ * inactive public servant configurations
+ */
 export const AuthenticationRoutes: AuthSession = {
   async login(config: LogtoNextConfig): Promise<void> {
     return signIn(addInactivePublicServantScope(config));

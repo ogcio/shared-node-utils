@@ -55,6 +55,14 @@ export class UserContextHandler implements UserContext {
   }
   async getContext(): Promise<AuthSessionContext>;
   async getContext(addOriginalContext?: boolean): Promise<AuthSessionContext>;
+  /**
+   * It loads the context from logto and parses it.
+   * It performs a network request only at first run, then Logto SDK
+   * stores the context itself.
+   * @param addOriginalContext (optional) if true, it set the originalContext property
+   * with the context loaded from Logto
+   * @returns The parsed context
+   */
   async getContext(addOriginalContext?: boolean): Promise<AuthSessionContext> {
     const includeOriginalContext = addOriginalContext ?? false;
     const context: LogtoContext = await this.getOriginalContext();
@@ -81,11 +89,18 @@ export class UserContextHandler implements UserContext {
    */
   async getUser(): Promise<AuthSessionUserInfo> {
     const context = await this.getOriginalContext(true);
-
-    const parsed = parseUserInfo(context, this.getContextParameters);
-    if (!parsed) {
-      throw new Error("Can't extract user data");
+    if (!context.userInfo) {
+      throw new Error("Cannot get user info");
     }
+    const parsed = parseUserInfo(
+      { ...context, userInfo: context.userInfo },
+      this.getContextParameters,
+    );
+
+    if (!parsed) {
+      throw new Error("Cannot parse user info");
+    }
+
     return parsed;
   }
   async isAuthenticated(): Promise<boolean> {
@@ -93,6 +108,10 @@ export class UserContextHandler implements UserContext {
 
     return context.isAuthenticated ?? false;
   }
+  /**
+   * @returns True if the user has at least one of the publicServantExpectedRoles
+   * for the current organization
+   */
   async isPublicServant(): Promise<boolean> {
     const context = await this.getContext();
 
@@ -103,6 +122,9 @@ export class UserContextHandler implements UserContext {
 
     return !(context.isInactivePublicServant || context.isPublicServant);
   }
+  /**
+   * @returns True if the user has the inactivePublicServant role
+   */
   async isInactivePublicServant(): Promise<boolean> {
     const context = await this.getContext();
 
@@ -148,6 +170,7 @@ export class UserContextHandler implements UserContext {
       "As a public servant one between resource and organization id must be set",
     );
   }
+
   /**
    * Use this method carefully
    * cause it runs a network request against Logto
