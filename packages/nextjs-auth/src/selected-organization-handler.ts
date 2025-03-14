@@ -1,5 +1,4 @@
 import { cookies } from "next/headers.js";
-import { AuthCookieNames, LifeEventsAuthCookies } from "./auth-cookies.js";
 import type { SelectedOrganization } from "./types.js";
 
 const SELECTED_ORG_COOKIE = "bb-selected-org-id";
@@ -9,7 +8,6 @@ export const SelectedOrganizationHandler: SelectedOrganization = {
     if (!overwrite && SelectedOrganizationHandler.isSet()) {
       return;
     }
-    LifeEventsAuthCookies.clear();
     cookies().set(SELECTED_ORG_COOKIE, organizationId, { secure });
   },
   get(): string | undefined {
@@ -21,7 +19,6 @@ export const SelectedOrganizationHandler: SelectedOrganization = {
     return value.value;
   },
   delete(): void {
-    LifeEventsAuthCookies.clear();
     cookies().delete(SELECTED_ORG_COOKIE);
   },
   isSet(): boolean {

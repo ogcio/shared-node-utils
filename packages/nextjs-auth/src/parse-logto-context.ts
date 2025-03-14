@@ -148,10 +148,7 @@ export function parseUserInfo(
 export function parseContext(
   context: LogtoContext,
   getContextParameters: GetContextParams,
-  previousUserInfo: AuthSessionUserInfo | undefined,
 ): AuthSessionContext {
-  const userInfo =
-    previousUserInfo ?? parseUserInfo(context, getContextParameters);
   const orgRoles = parseOrganizationRoles(context);
   const orgInfo = parseOrganizationInfo(
     context,
@@ -166,9 +163,6 @@ export function parseContext(
     isInactivePublicServant: isInactivePs,
   };
 
-  if (userInfo) {
-    outputContext.user = userInfo;
-  }
   if (orgInfo) {
     outputContext.organization = orgInfo;
   }

@@ -36,7 +36,6 @@ export type AuthSessionOrganizationInfo = {
 };
 
 export type AuthSessionContext = {
-  user?: AuthSessionUserInfo;
   isPublicServant: boolean;
   isInactivePublicServant: boolean;
   organization?: AuthSessionOrganizationInfo;

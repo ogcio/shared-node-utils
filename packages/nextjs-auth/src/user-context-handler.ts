@@ -4,10 +4,8 @@ import {
   getLogtoContext,
   getOrganizationToken,
 } from "@logto/next/server-actions";
-import { cookies } from "next/headers.js";
 import { redirect } from "next/navigation.js";
 import type { Logger } from "pino";
-import { AuthCookieNames, LifeEventsAuthCookies } from "./auth-cookies.js";
 import { hasPermissions } from "./check-permissions.js";
 import { addInactivePublicServantScope } from "./inactive-public-servant.js";
 import { parseContext, parseUserInfo } from "./parse-logto-context.js";
@@ -37,12 +35,11 @@ export class UserContextHandler implements UserContext {
       this.getContextParameters?.additionalContextParams?.loginUrl ??
       DEFAULT_LOGIN_PATH;
   }
-  private async getOriginalContext(): Promise<LogtoContext> {
+  private async getOriginalContext(
+    fetchUserInfo?: boolean,
+  ): Promise<LogtoContext> {
     let context: LogtoContext | undefined;
     try {
-      const fetchUserInfo = !LifeEventsAuthCookies.has(
-        AuthCookieNames.LifeEventsUserInfo,
-      );
       context = await getLogtoContext(this.config, {
         ...this.getContextParameters?.logtoContextParams,
         fetchUserInfo,
@@ -62,84 +59,33 @@ export class UserContextHandler implements UserContext {
   async getContext(addOriginalContext?: boolean): Promise<AuthSessionContext> {
     const includeOriginalContext = addOriginalContext ?? false;
     const context: LogtoContext = await this.getOriginalContext();
-    const cookieContext = LifeEventsAuthCookies.get<AuthSessionContext>(
-      AuthCookieNames.LifeEventsAuthContext,
-    );
-    if (cookieContext) {
-      return {
-        ...cookieContext,
-        originalContext: includeOriginalContext ? context : undefined,
-      };
-    }
+
     let parsed: AuthSessionContext | undefined;
     try {
-      parsed = parseContext(
-        context,
-        {
-          ...this.getContextParameters,
-          additionalContextParams: {
-            ...this.getContextParameters.additionalContextParams,
-            includeOriginalContext,
-          },
+      parsed = parseContext(context, {
+        ...this.getContextParameters,
+        additionalContextParams: {
+          ...this.getContextParameters.additionalContextParams,
+          includeOriginalContext,
         },
-        LifeEventsAuthCookies.get<AuthSessionUserInfo>(
-          AuthCookieNames.LifeEventsUserInfo,
-        ),
-      );
+      });
     } catch (err) {
       this.logger.warn({ error: err }, "Cannot parse logto context");
       redirect(this.loginUrl);
     }
-    try {
-      LifeEventsAuthCookies.set({
-        name: AuthCookieNames.LifeEventsAuthContext,
-        value: JSON.stringify(parsed),
-        secure: this.cookieSecure,
-      });
-    } catch (e) {
-      const errorMessage = e as Record<string, unknown>;
-      if (
-        !("message" in errorMessage) ||
-        !(
-          typeof errorMessage.message === "string" &&
-          errorMessage.message.startsWith("Cookies can only be modified")
-        )
-      ) {
-        throw e;
-      }
-    }
     return parsed;
   }
+  /**
+   * Use this method carefully
+   * cause it runs a network request against Logto
+   * @returns The user info from Logto
+   */
   async getUser(): Promise<AuthSessionUserInfo> {
-    const cookieValue = LifeEventsAuthCookies.get<AuthSessionUserInfo>(
-      AuthCookieNames.LifeEventsUserInfo,
-    );
-    if (cookieValue) {
-      return cookieValue;
-    }
-    const context = await this.getOriginalContext();
+    const context = await this.getOriginalContext(true);
 
     const parsed = parseUserInfo(context, this.getContextParameters);
     if (!parsed) {
       throw new Error("Can't extract user data");
-    }
-    try {
-      LifeEventsAuthCookies.set({
-        name: AuthCookieNames.LifeEventsUserInfo,
-        value: JSON.stringify(parsed),
-        secure: this.cookieSecure,
-      });
-    } catch (e) {
-      const errorMessage = e as Record<string, unknown>;
-      if (
-        !("message" in errorMessage) ||
-        !(
-          typeof errorMessage.message === "string" &&
-          errorMessage.message.startsWith("Cookies can only be modified")
-        )
-      ) {
-        throw e;
-      }
     }
     return parsed;
   }
@@ -220,16 +166,21 @@ export class UserContextHandler implements UserContext {
 
     return userId;
   }
+  /**
+   * Use this method carefully
+   * cause it runs a network request against Logto
+   * @returns The current organization info from Logto
+   */
   async getCurrentOrganization(): Promise<OrganizationData | undefined> {
     if (!this.organizationId) {
       return undefined;
     }
-    const context = await this.getContext();
+    const user = await this.getUser();
 
-    if (!context.user?.organizationData) {
+    if (!user?.organizationData) {
       return undefined;
     }
 
-    return context.user.organizationData[this.organizationId];
+    return user.organizationData[this.organizationId];
   }
 }
