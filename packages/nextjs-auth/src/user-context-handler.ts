@@ -115,11 +115,22 @@ export class UserContextHandler implements UserContext {
 
     return hasPermissions(scopes, permissions, { method: "OR" });
   }
+  /**
+   * @returns The token got from the current context,
+   * it does not perform any network request
+   */
   async getTokenFromContext(): Promise<string | undefined> {
     const context = await this.getOriginalContext();
 
     return context.accessToken;
   }
+  /**
+   * It performs a network request to logto asking for a token for a specific resource or,
+   * if allowed, an organization token for the current organization
+   * @param resource The optional resource url you want to get a token for,
+   * if not set, an organization token is requested
+   * @returns
+   */
   async getToken(resource?: string): Promise<string> {
     const isCitizen = await this.isCitizen();
     if (!resource && isCitizen) {
