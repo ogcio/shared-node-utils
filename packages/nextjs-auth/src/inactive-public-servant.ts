@@ -1,4 +1,5 @@
 import type { LogtoNextConfig } from "@logto/next";
+import { deepClone } from "./utils/deep-clone.js";
 
 export const INACTIVE_PUBLIC_SERVANT_SCOPE = "bb:public-servant.inactive:*";
 export const INACTIVE_PUBLIC_SERVANT_ORG_ROLE =
@@ -7,7 +8,7 @@ export const INACTIVE_PUBLIC_SERVANT_ORG_ROLE =
 export function addInactivePublicServantScope(
   config: LogtoNextConfig,
 ): LogtoNextConfig {
-  const outputConfig = { ...config };
+  const outputConfig = deepClone(config);
   if (
     outputConfig.scopes &&
     !outputConfig.scopes.includes(INACTIVE_PUBLIC_SERVANT_SCOPE)
