@@ -60,9 +60,9 @@ export interface UserContext {
 }
 
 export interface SelectedOrganization {
-  set(organizationId: string, overwrite?: boolean): void;
+  set(organizationId: string, secure: boolean, overwrite?: boolean): void;
   get(): string | undefined;
-  unset(): void;
+  delete(): void;
   isSet(): boolean;
 }
 

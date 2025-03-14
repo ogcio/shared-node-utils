@@ -4,8 +4,10 @@ import {
   getLogtoContext,
   getOrganizationToken,
 } from "@logto/next/server-actions";
+import { cookies } from "next/headers.js";
 import { redirect } from "next/navigation.js";
 import type { Logger } from "pino";
+import { AuthCookieNames, LifeEventsAuthCookies } from "./auth-cookies.js";
 import { hasPermissions } from "./check-permissions.js";
 import { addInactivePublicServantScope } from "./inactive-public-servant.js";
 import { parseContext, parseUserInfo } from "./parse-logto-context.js";
@@ -21,12 +23,12 @@ import {
 export class UserContextHandler implements UserContext {
   readonly config: LogtoNextConfig;
   private organizationId?: string;
-  private userInfo: AuthSessionUserInfo | undefined;
   private loginUrl: string;
   constructor(
     config: LogtoNextConfig,
     private readonly getContextParameters: GetContextParams,
     private readonly logger: Logger,
+    private readonly cookieSecure: boolean,
   ) {
     this.config = addInactivePublicServantScope(config);
     this.organizationId =
@@ -38,7 +40,9 @@ export class UserContextHandler implements UserContext {
   private async getOriginalContext(): Promise<LogtoContext> {
     let context: LogtoContext | undefined;
     try {
-      const fetchUserInfo = this.userInfo === undefined;
+      const fetchUserInfo = !LifeEventsAuthCookies.has(
+        AuthCookieNames.LifeEventsUserInfo,
+      );
       context = await getLogtoContext(this.config, {
         ...this.getContextParameters?.logtoContextParams,
         fetchUserInfo,
@@ -58,9 +62,18 @@ export class UserContextHandler implements UserContext {
   async getContext(addOriginalContext?: boolean): Promise<AuthSessionContext> {
     const includeOriginalContext = addOriginalContext ?? false;
     const context: LogtoContext = await this.getOriginalContext();
-
+    const cookieContext = LifeEventsAuthCookies.get<AuthSessionContext>(
+      AuthCookieNames.LifeEventsAuthContext,
+    );
+    if (cookieContext) {
+      return {
+        ...cookieContext,
+        originalContext: includeOriginalContext ? context : undefined,
+      };
+    }
+    let parsed: AuthSessionContext | undefined;
     try {
-      return parseContext(
+      parsed = parseContext(
         context,
         {
           ...this.getContextParameters,
@@ -69,25 +82,44 @@ export class UserContextHandler implements UserContext {
             includeOriginalContext,
           },
         },
-        this.userInfo,
+        LifeEventsAuthCookies.get<AuthSessionUserInfo>(
+          AuthCookieNames.LifeEventsUserInfo,
+        ),
       );
     } catch (err) {
       this.logger.warn({ error: err }, "Cannot parse logto context");
       redirect(this.loginUrl);
     }
+
+    LifeEventsAuthCookies.set({
+      name: AuthCookieNames.LifeEventsAuthContext,
+      value: JSON.stringify(parsed),
+      secure: this.cookieSecure,
+    });
+
+    return parsed;
   }
   async getUser(): Promise<AuthSessionUserInfo> {
-    if (this.userInfo) {
-      return this.userInfo;
+    const cookieValue = LifeEventsAuthCookies.get<AuthSessionUserInfo>(
+      AuthCookieNames.LifeEventsUserInfo,
+    );
+    if (cookieValue) {
+      return cookieValue;
     }
     const context = await this.getOriginalContext();
 
-    this.userInfo = parseUserInfo(context, this.getContextParameters);
-    if (!this.userInfo) {
+    const parsed = parseUserInfo(context, this.getContextParameters);
+    if (!parsed) {
       throw new Error("Can't extract user data");
     }
 
-    return this.userInfo;
+    LifeEventsAuthCookies.set({
+      name: AuthCookieNames.LifeEventsUserInfo,
+      value: JSON.stringify(parsed),
+      secure: this.cookieSecure,
+    });
+
+    return parsed;
   }
   async isAuthenticated(): Promise<boolean> {
     const context = await this.getOriginalContext();
