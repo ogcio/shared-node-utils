@@ -26,7 +26,6 @@ export class UserContextHandler implements UserContext {
     config: LogtoNextConfig,
     private readonly getContextParameters: GetContextParams,
     private readonly logger: Logger,
-    private readonly cookieSecure: boolean,
   ) {
     this.config = addInactivePublicServantScope(config);
     this.organizationId =
