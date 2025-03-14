@@ -41,24 +41,23 @@ export function parseOrganizationInfo(
 export const parseOrganizationRoles = (
   context: LogtoContext,
 ): string[] | null => {
-  let organizationRoles: Set<string> | null = null;
+  const organizationRoles: string[] = [];
 
   if (context.claims && Array.isArray(context.claims.organization_roles)) {
-    organizationRoles = new Set<string>(context.claims.organization_roles);
+    organizationRoles.push(...context.claims.organization_roles);
   }
 
   if (context.userInfo && Array.isArray(context.userInfo.organization_roles)) {
-    if (organizationRoles === null) {
-      organizationRoles = new Set<string>();
-    }
-
-    organizationRoles = new Set<string>([
-      ...Array.from(organizationRoles),
-      ...context.userInfo.organization_roles,
-    ]);
+    organizationRoles.push(...context.userInfo.organization_roles);
   }
 
-  return organizationRoles ? Array.from(organizationRoles) : null;
+  if (organizationRoles.length === 0) {
+    return null;
+  }
+
+  const uniqueValues = new Set<string>(organizationRoles);
+
+  return Array.from(uniqueValues);
 };
 
 function isPublicServant(
