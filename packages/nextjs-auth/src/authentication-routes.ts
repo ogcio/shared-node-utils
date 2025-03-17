@@ -1,7 +1,7 @@
 import type { LogtoNextConfig } from "@logto/next";
 import { handleSignIn, signIn, signOut } from "@logto/next/server-actions";
 import { addInactivePublicServantScope } from "./inactive-public-servant.js";
-// import { SelectedOrganizationHandler } from "./selected-organization-handler.js";
+import { SelectedOrganizationHandler } from "./selected-organization-handler.js";
 import type { AuthSession } from "./types.js";
 
 /**
@@ -13,7 +13,7 @@ export const AuthenticationRoutes: AuthSession = {
     return signIn(addInactivePublicServantScope(config));
   },
   async logout(config: LogtoNextConfig, redirectUri: string): Promise<void> {
-    //SelectedOrganizationHandler.delete();
+    SelectedOrganizationHandler.delete();
     return signOut(addInactivePublicServantScope(config), redirectUri);
   },
   async loginCallback(

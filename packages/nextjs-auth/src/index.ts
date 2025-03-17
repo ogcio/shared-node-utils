@@ -1,9 +1,9 @@
-// export { SelectedOrganizationHandler } from "./selected-organization-handler.js";
+export { SelectedOrganizationHandler } from "./selected-organization-handler.js";
 export { AuthenticationRoutes } from "./authentication-routes.js";
 export { UserContextHandler } from "./user-context-handler.js";
 export {
   AuthSessionContext,
   AuthSessionUserInfo,
   AuthSessionOrganizationInfo,
-  getBasicOrganizationScopes,
+  getDefaultScopes,
 } from "./types.js";
