@@ -5,5 +5,5 @@ export {
   AuthSessionContext,
   AuthSessionUserInfo,
   AuthSessionOrganizationInfo,
-  getBasicOrganizationRoles,
+  getBasicOrganizationScopes,
 } from "./types.js";

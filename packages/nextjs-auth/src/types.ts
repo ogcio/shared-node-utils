@@ -65,6 +65,15 @@ export type GetContextParams = {
   };
 };
 
-export function getBasicOrganizationRoles(): UserScope[] {
-  return [UserScope.Organizations, UserScope.OrganizationRoles];
+/**
+ * Logto claims needed to parse roles info
+ * https://docs.logto.io/quick-starts/next-app-router
+ * @returns list of default scopes
+ */
+export function getDefaultScopes(): UserScope[] {
+  return [
+    UserScope.Organizations,
+    UserScope.OrganizationRoles,
+    UserScope.Roles,
+  ];
 }
