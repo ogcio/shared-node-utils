@@ -33,6 +33,16 @@ export default fp(
         httpResponsesCounter.add(1, { status_code: reply.statusCode });
 
         if (reply.getHeader(ACCESS_CONTROL_EXPOSE_HEADERS)) {
+          // x-trace-id header is already exposed, exit
+          if (
+            reply
+              .getHeader(ACCESS_CONTROL_EXPOSE_HEADERS)
+              ?.toString()
+              .includes(X_TRACE_ID)
+          ) {
+            return done();
+          }
+
           reply.header(
             ACCESS_CONTROL_EXPOSE_HEADERS,
             `${X_TRACE_ID}, ${reply.getHeader(ACCESS_CONTROL_EXPOSE_HEADERS)}`,

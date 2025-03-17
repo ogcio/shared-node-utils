@@ -98,4 +98,57 @@ describe("Verify X-Trace-Id", () => {
 
     server.close();
   });
+
+  test("cors config expose x-trace-id, plugin must skip header concatenation and response container exposed headers", async () => {
+    const server = buildFastify();
+
+    server.register(cors, (_app: FastifyInstance) => {
+      return (
+        _req: FastifyRequest,
+        callback: (
+          error: Error | null,
+          corsOptions?: FastifyCorsOptions,
+        ) => void,
+      ) => {
+        const corsOptions: FastifyCorsOptions = {
+          origin: (_origin, cb) => {
+            cb(null, true);
+          },
+          exposedHeaders: ["Content-Type", "Custom-Header", X_TRACE_ID],
+        };
+
+        callback(null, corsOptions);
+      };
+    });
+
+    const response = await server.inject({
+      method: "GET",
+      url: "/",
+    });
+    assert.ok(typeof response !== "undefined");
+    assert.equal(response?.statusCode, 200);
+    assert.equal(response.headers[X_TRACE_ID], "mock-trace-id");
+    assert.isNotNull(response.headers["access-control-request-headers"]);
+
+    const expectedAccessHeaders = response.headers[
+      "access-control-expose-headers"
+    ]
+      ?.split(",")
+      .map((h) => h.trim());
+
+    // verify cors exposed headers has been propagated
+    assert.isNotEmpty(expectedAccessHeaders);
+
+    if (expectedAccessHeaders) {
+      assert.equal(expectedAccessHeaders[0], "Content-Type");
+      assert.equal(expectedAccessHeaders[1], "Custom-Header");
+      assert.equal(expectedAccessHeaders[2], X_TRACE_ID);
+    }
+
+    expect(mocks.add).toHaveBeenCalledWith(1, {
+      status_code: 200,
+    });
+
+    server.close();
+  });
 });
