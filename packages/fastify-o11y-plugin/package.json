@@ -30,6 +30,9 @@
     "@ogcio/o11y-sdk-node": ">=0.1.0-beta.8",
     "fastify": ">=5.0.0"
   },
+  "devDependencies": {
+    "@fastify/cors": "^10.1.0"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/ogcio/shared-node-utils.git",

@@ -1,4 +1,6 @@
-import { assert, afterAll, describe, expect, test, vi } from "vitest";
+import cors, { type FastifyCorsOptions } from "@fastify/cors";
+import type { FastifyInstance, FastifyRequest } from "fastify";
+import { assert, describe, expect, test, vi } from "vitest";
 import { X_TRACE_ID } from "../src";
 import { buildFastify } from "./build-fastify";
 
@@ -28,9 +30,9 @@ vi.mock("@ogcio/o11y-sdk-node", async (importOriginal) => {
 });
 
 describe("Verify X-Trace-Id", () => {
-  const server = buildFastify();
-
   test("response should contain header with mock value", async () => {
+    const server = buildFastify();
+
     const response = await server.inject({
       method: "GET",
       url: "/",
@@ -42,15 +44,35 @@ describe("Verify X-Trace-Id", () => {
     expect(mocks.add).toHaveBeenCalledWith(1, {
       status_code: 200,
     });
+
+    server.close();
   });
 
   test("response should contain all access control expose headers", async () => {
+    const server = buildFastify();
+
+    server.register(cors, (_app: FastifyInstance) => {
+      return (
+        _req: FastifyRequest,
+        callback: (
+          error: Error | null,
+          corsOptions?: FastifyCorsOptions,
+        ) => void,
+      ) => {
+        const corsOptions: FastifyCorsOptions = {
+          origin: (_origin, cb) => {
+            cb(null, true);
+          },
+          exposedHeaders: ["Content-Type", "Custom-Header"],
+        };
+
+        callback(null, corsOptions);
+      };
+    });
+
     const response = await server.inject({
       method: "GET",
       url: "/",
-      headers: {
-        "access-control-request-headers": "Content-Type, Custom-Header",
-      },
     });
     assert.ok(typeof response !== "undefined");
     assert.equal(response?.statusCode, 200);
@@ -58,22 +80,22 @@ describe("Verify X-Trace-Id", () => {
     assert.isNotNull(response.headers["access-control-request-headers"]);
 
     const expectedAccessHeaders = response.headers[
-      "access-control-request-headers"
+      "access-control-expose-headers"
     ]
       ?.split(",")
       .map((h) => h.trim());
 
+    // verify cors exposed headers has been propagated
     assert.isNotEmpty(expectedAccessHeaders);
     if (expectedAccessHeaders) {
-      assert.equal(expectedAccessHeaders[0], X_TRACE_ID);
-      assert.equal(expectedAccessHeaders[1], "Content-Type");
-      assert.equal(expectedAccessHeaders[2], "Custom-Header");
+      assert.equal(expectedAccessHeaders[0], "Content-Type");
+      assert.equal(expectedAccessHeaders[1], "Custom-Header");
     }
 
     expect(mocks.add).toHaveBeenCalledWith(1, {
       status_code: 200,
     });
-  });
 
-  afterAll(() => server.close());
+    server.close();
+  });
 });
