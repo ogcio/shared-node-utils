@@ -2,7 +2,7 @@ import { getActiveSpan, getMetric } from "@ogcio/o11y-sdk-node";
 import type { FastifyInstance } from "fastify";
 import fp from "fastify-plugin";
 
-export const X_TRACE_ID = "x-trace-id";
+const ACCESS_CONTROL_EXPOSE_HEADERS = "access-control-expose-headers";
 
 const httpResponsesCounter = getMetric<"counter", { status_code: number }>(
   "counter",
@@ -12,23 +12,51 @@ const httpResponsesCounter = getMetric<"counter", { status_code: number }>(
   },
 );
 
-export default fp(async (server: FastifyInstance) => {
-  server.addHook("onRequest", (_request, reply, done) => {
-    try {
-      const traceId = getActiveSpan()?.spanContext()?.traceId;
-      if (traceId) {
-        reply.header(X_TRACE_ID, traceId);
-      }
-    } finally {
-      done();
-    }
-  });
+export const X_TRACE_ID = "x-trace-id";
 
-  server.addHook("onResponse", (_request, reply, done) => {
-    try {
-      httpResponsesCounter.add(1, { status_code: reply.statusCode });
-    } finally {
-      done();
-    }
-  });
-});
+export default fp(
+  async (server: FastifyInstance) => {
+    server.addHook("onRequest", (_request, reply, done) => {
+      try {
+        const traceId = getActiveSpan()?.spanContext()?.traceId;
+
+        if (traceId) {
+          reply.header(X_TRACE_ID, traceId);
+        }
+      } finally {
+        done();
+      }
+    });
+
+    server.addHook("onResponse", (_request, reply, done) => {
+      try {
+        httpResponsesCounter.add(1, { status_code: reply.statusCode });
+
+        if (reply.getHeader(ACCESS_CONTROL_EXPOSE_HEADERS)) {
+          // x-trace-id header is already exposed, exit
+          if (
+            reply
+              .getHeader(ACCESS_CONTROL_EXPOSE_HEADERS)
+              ?.toString()
+              .includes(X_TRACE_ID)
+          ) {
+            return done();
+          }
+
+          reply.header(
+            ACCESS_CONTROL_EXPOSE_HEADERS,
+            `${X_TRACE_ID}, ${reply.getHeader(ACCESS_CONTROL_EXPOSE_HEADERS)}`,
+          );
+        } else {
+          reply.header(ACCESS_CONTROL_EXPOSE_HEADERS, X_TRACE_ID);
+        }
+      } finally {
+        done();
+      }
+    });
+  },
+  {
+    fastify: "5.x",
+    name: "@ogcio/fastify-o11y-plugin",
+  },
+);

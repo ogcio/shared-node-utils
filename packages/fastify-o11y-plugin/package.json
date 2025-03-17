@@ -1,6 +1,6 @@
 {
   "name": "@ogcio/fastify-o11y-plugin",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "type": "module",
@@ -9,7 +9,14 @@
     "test": "vitest run --coverage --outputFile=results.xml",
     "prepublishOnly": "npm i && npm run build && npm run test"
   },
-  "keywords": [],
+  "keywords": [
+    "observability",
+    "o11y",
+    "ogcio",
+    "opentelemetry",
+    "fastify",
+    "fastify-plugin"
+  ],
   "author": {
     "name": "Andrea Bozzelli",
     "email": "andrea.bozzelli@nearform.com"
@@ -22,6 +29,9 @@
   "peerDependencies": {
     "@ogcio/o11y-sdk-node": ">=0.1.0-beta.8",
     "fastify": ">=5.0.0"
+  },
+  "devDependencies": {
+    "@fastify/cors": "^10.1.0"
   },
   "repository": {
     "type": "git",
