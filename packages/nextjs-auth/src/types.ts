@@ -5,14 +5,10 @@ import {
 } from "@logto/next";
 import type { getLogtoContext } from "@logto/next/server-actions";
 
-export type OrganizationData = {
-  id: string;
-  name: string;
-  description: string | null;
-};
 export type AuthSessionUserInfo = {
   id: string;
-  organizationData?: Record<string, OrganizationData>;
+  organizationData: Record<string, AuthSessionOrganizationInfo> | undefined;
+  currentOrganization: AuthSessionOrganizationInfo | undefined;
 };
 
 export interface AuthSession {
@@ -28,12 +24,12 @@ export type AuthSessionOrganizationInfo = {
   id: string;
   name: string;
   roles: string[];
+  description: string | null;
 };
 
 export type AuthSessionContext = {
   isPublicServant: boolean;
   isInactivePublicServant: boolean;
-  organization?: AuthSessionOrganizationInfo;
   originalContext?: LogtoContext;
 };
 
@@ -50,7 +46,6 @@ export interface UserContext {
   getContext(): Promise<AuthSessionContext>;
   getTokenFromContext(): Promise<string | undefined>;
   getToken(resource?: string): Promise<string>;
-  getCurrentOrganization(): Promise<OrganizationData | undefined>;
 }
 
 export interface SelectedOrganization {

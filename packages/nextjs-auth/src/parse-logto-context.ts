@@ -5,7 +5,6 @@ import type {
   AuthSessionOrganizationInfo,
   AuthSessionUserInfo,
   GetContextParams,
-  OrganizationData,
 } from "./types.js";
 
 /**
@@ -17,8 +16,7 @@ import type {
 export function parseOrganizationInfo(
   context: LogtoContext,
   organizationRoles: string[] | null,
-  requestedOrganizationId: string,
-): AuthSessionOrganizationInfo | undefined {
+): Record<string, AuthSessionOrganizationInfo> | undefined {
   if (organizationRoles === null || organizationRoles.length === 0) {
     return undefined;
   }
@@ -27,21 +25,28 @@ export function parseOrganizationInfo(
     return undefined;
   }
 
-  if (!context.userInfo?.organizations?.includes(requestedOrganizationId)) {
-    return undefined;
-  }
-
-  for (const currentOrg of context.userInfo.organization_data) {
-    if (currentOrg.id === requestedOrganizationId) {
-      return {
-        id: currentOrg.id,
-        name: currentOrg.name,
-        roles: organizationRoles,
-      };
+  const rolesByOrg: Record<string, string[]> = {};
+  // The organization role names are in format
+  // orgId:roleName
+  for (const role of organizationRoles) {
+    const [orgId, roleName] = role.split(":");
+    if (!rolesByOrg[orgId]) {
+      rolesByOrg[orgId] = [];
     }
+    rolesByOrg[orgId].push(roleName);
   }
 
-  return undefined;
+  const output: Record<string, AuthSessionOrganizationInfo> = {};
+  for (const currentOrg of context.userInfo.organization_data) {
+    output[currentOrg.id] = {
+      id: currentOrg.id,
+      name: currentOrg.name,
+      roles: rolesByOrg[currentOrg.id] ?? [],
+      description: currentOrg.description,
+    };
+  }
+
+  return output;
 }
 
 /**
@@ -93,7 +98,7 @@ function isPublicServant(
  */
 export function parseUserInfo(
   context: LogtoContext & { userInfo: UserInfoResponse },
-  getContextParameters: GetContextParams,
+  currentOrganizationId: string | undefined,
 ): AuthSessionUserInfo | undefined {
   let name: string | null = null;
   let username: string | null = null;
@@ -115,30 +120,19 @@ export function parseUserInfo(
   if (id === null || (name === null && username === null && email === null)) {
     return undefined;
   }
-
-  const organizations = (context.userInfo?.organization_data ?? []).filter(
-    (org) => {
-      return (
-        getContextParameters.additionalContextParams
-          ?.publicServantExpectedRoles ?? []
-      ).some((role) => {
-        const orgPSRole = `${org.id}:${role}`;
-        return context.userInfo?.organization_roles?.includes(orgPSRole);
-      });
-    },
-  );
-
-  const organizationData = organizations.reduce(
-    (acc: Record<string, OrganizationData>, current) => {
-      acc[current.id] = current;
-      return acc;
-    },
-    {},
-  );
+  const organizationRoles = parseOrganizationRoles(context);
+  const organizationData = parseOrganizationInfo(context, organizationRoles);
+  const currentOrganization =
+    currentOrganizationId &&
+    organizationData &&
+    currentOrganizationId in organizationData
+      ? organizationData[currentOrganizationId]
+      : undefined;
 
   return {
     id,
     organizationData,
+    currentOrganization,
   };
 }
 
@@ -153,13 +147,13 @@ export function parseContext(
   getContextParameters: GetContextParams,
 ): AuthSessionContext {
   const orgRoles = parseOrganizationRoles(context);
-  const orgInfo = getContextParameters.additionalContextParams?.organizationId
-    ? parseOrganizationInfo(
-        context,
-        orgRoles,
-        getContextParameters.additionalContextParams.organizationId,
-      )
-    : undefined;
+  // const orgInfo = getContextParameters.additionalContextParams?.organizationId
+  //   ? parseOrganizationInfo(
+  //       context,
+  //       orgRoles,
+  //       getContextParameters.additionalContextParams.organizationId,
+  //     )
+  //   : undefined;
   const isPs = isPublicServant(orgRoles, getContextParameters);
   const isInactivePs = isInactivePublicServant(orgRoles);
 
@@ -168,9 +162,6 @@ export function parseContext(
     isInactivePublicServant: isInactivePs,
   };
 
-  if (orgInfo) {
-    outputContext.organization = orgInfo;
-  }
   if (getContextParameters.additionalContextParams?.includeOriginalContext) {
     outputContext.originalContext = context;
   }

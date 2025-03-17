@@ -13,7 +13,6 @@ import type {
   AuthSessionContext,
   AuthSessionUserInfo,
   GetContextParams,
-  OrganizationData,
   UserContext,
 } from "./types.js";
 import { DEFAULT_LOGIN_PATH } from "./utils/constants.js";
@@ -94,7 +93,7 @@ export class UserContextHandler implements UserContext {
     }
     const parsed = parseUserInfo(
       { ...context, userInfo: context.userInfo },
-      this.getContextParameters,
+      this.organizationId,
     );
 
     if (!parsed) {
@@ -169,23 +168,5 @@ export class UserContextHandler implements UserContext {
     throw new Error(
       "As a public servant one between resource and organization id must be set",
     );
-  }
-
-  /**
-   * Use this method carefully
-   * cause it runs a network request against Logto
-   * @returns The current organization info from Logto
-   */
-  async getCurrentOrganization(): Promise<OrganizationData | undefined> {
-    if (!this.organizationId) {
-      return undefined;
-    }
-    const user = await this.getUser();
-
-    if (!user?.organizationData) {
-      return undefined;
-    }
-
-    return user.organizationData[this.organizationId];
   }
 }
