@@ -9,7 +9,7 @@ const httpResponsesCounter = getMetric<"counter", { status_code: number }>(
   {
     meterName: "http.server.responses",
     metricName: "http.server.responses",
-  }
+  },
 );
 
 export default fp(async (server: FastifyInstance) => {

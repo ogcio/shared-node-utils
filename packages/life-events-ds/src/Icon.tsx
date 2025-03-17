@@ -9,34 +9,41 @@ type Props = {
   width?: number;
   heigth?: number;
   icon:
-  | "events"
-  | "about"
-  | "birth"
-  | "health"
-  | "driving"
-  | "employment"
-  | "business"
-  | "housing"
-  | "death"
-  | "payments"
-  | "providers"
-  | "login"
-  | "logout"
-  | "notification"
-  | "search"
-  | "hamburger-menu"
-  | "tiles"
-  | "messaging-service"
-  | "payments-service"
-  | "send-a-message"
-  | "template"
-  | "settings"
-  | "check-mark"
-  | "journey-builder"
-  | "notification-settings";
+    | "events"
+    | "about"
+    | "birth"
+    | "health"
+    | "driving"
+    | "employment"
+    | "business"
+    | "housing"
+    | "death"
+    | "payments"
+    | "providers"
+    | "login"
+    | "logout"
+    | "notification"
+    | "search"
+    | "hamburger-menu"
+    | "tiles"
+    | "messaging-service"
+    | "payments-service"
+    | "send-a-message"
+    | "template"
+    | "settings"
+    | "check-mark"
+    | "journey-builder"
+    | "notification-settings";
 };
 
-export const Icon = ({ className, color, icon, size, heigth, width }: Props) => {
+export const Icon = ({
+  className,
+  color,
+  icon,
+  size,
+  heigth,
+  width,
+}: Props) => {
   const iconClassName = `ds-icon-${icon}`;
   const _className = ["ds-icon", iconClassName, className || ""].join(" ");
   const style: React.CSSProperties = { color };

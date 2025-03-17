@@ -1,100 +1,79 @@
-import type { LogtoContext, LogtoNextConfig } from "@logto/next";
+import {
+  type LogtoContext,
+  type LogtoNextConfig,
+  UserScope,
+} from "@logto/next";
+import type { getLogtoContext } from "@logto/next/server-actions";
 
-export type GovIdJwtPayload = {
-  surname: string;
-  givenName: string;
-  email: string;
-  BirthDate: string;
-  PublicServiceNumber: string;
-  DSPOnlineLevel: string;
-  mobile: string;
-};
-
-export type SessionTokenDecoded = {
-  firstName: string;
-  lastName: string;
-  email: string;
-  birthDate: string;
-  publicServiceNumber: string;
-};
-
-export type Session = {
-  token: string;
-  userId: string;
-};
-
-export type AuthConfig = LogtoNextConfig;
-
-export type OrganizationData = {
-  id: string;
-  name: string;
-  description: string | null;
-};
 export type AuthSessionUserInfo = {
-  name: string | null;
-  username: string | null;
   id: string;
-  email: string | null;
-  organizationData?: Record<string, OrganizationData>;
+  organizationData: Record<string, AuthSessionOrganizationInfo> | undefined;
+  currentOrganization: AuthSessionOrganizationInfo | undefined;
 };
+
+export interface AuthSession {
+  login(config: LogtoNextConfig): Promise<void>;
+  logout(config: LogtoNextConfig, redirectUri: string): Promise<void>;
+  loginCallback(
+    config: LogtoNextConfig,
+    searchParams: URLSearchParams,
+  ): Promise<void>;
+}
 
 export type AuthSessionOrganizationInfo = {
   id: string;
   name: string;
   roles: string[];
+  description: string | null;
 };
 
-export type PartialAuthSessionContext = {
-  user?: AuthSessionUserInfo;
+export type AuthSessionContext = {
   isPublicServant: boolean;
   isInactivePublicServant: boolean;
-  organization?: AuthSessionOrganizationInfo;
   originalContext?: LogtoContext;
 };
 
-export type AuthSessionContext = Omit<PartialAuthSessionContext, "user"> & {
-  user: AuthSessionUserInfo;
-};
-
-export type GetSessionContextParameters = {
-  fetchUserInfo?: boolean;
-  organizationId?: string;
-  resource?: string;
-  getOrganizationToken?: boolean;
-  loginUrl?: string;
-  publicServantExpectedRoles: string[];
-  userType: "citizen" | "publicServant";
-  includeOriginalContext?: boolean;
-};
-
-export interface Sessions {
-  get(redirectUrl?: string): Promise<
-    SessionTokenDecoded & {
-      userId: string;
-      publicServant: boolean;
-      verificationLevel: number;
-      sessionId: string;
-    }
-  >;
+export interface UserContext {
+  getUser(): Promise<AuthSessionUserInfo>;
   isAuthenticated(): Promise<boolean>;
+  isPublicServant(): Promise<boolean>;
+  isInactivePublicServant(): Promise<boolean>;
+  isCitizen(): Promise<boolean>;
+  hasPermissions(
+    permissions: string[],
+    matchMethod: "OR" | "AND",
+  ): Promise<boolean>;
+  getContext(): Promise<AuthSessionContext>;
+  getTokenFromContext(): Promise<string | undefined>;
+  getToken(resource?: string): Promise<string>;
 }
 
-export type IAuthSession = {
-  login(config: AuthConfig): Promise<void>;
-  logout(config: AuthConfig, redirectUri?: string): Promise<void>;
-  get(
-    config: AuthConfig,
-    getContextParameters: GetSessionContextParameters,
-  ): Promise<PartialAuthSessionContext>;
-  isAuthenticated(
-    config: AuthConfig,
-    getContextParameters?: GetSessionContextParameters,
-  ): Promise<boolean>;
-  getSelectedOrganization(): string | undefined;
-  setSelectedOrganization(organizationId: string): string;
-  getCitizenToken(config: LogtoNextConfig, resource?: string): Promise<string>;
-  getOrgToken(
-    config: LogtoNextConfig,
-    organizationId?: string,
-  ): Promise<string>;
+export interface SelectedOrganization {
+  set(organizationId: string, secure: boolean, overwrite?: boolean): void;
+  get(): string | undefined;
+  delete(): void;
+  isSet(): boolean;
+}
+
+export type GetContextParams = {
+  logtoContextParams?: Parameters<typeof getLogtoContext>[1];
+  additionalContextParams?: {
+    includeOriginalContext?: boolean;
+    publicServantExpectedRoles?: string[];
+    loginUrl?: string;
+    organizationId?: string;
+  };
 };
+
+/**
+ * Logto claims needed to parse roles info
+ * https://docs.logto.io/quick-starts/next-app-router
+ * @returns list of default scopes
+ */
+export function getDefaultScopes(): UserScope[] {
+  return [
+    UserScope.Organizations,
+    UserScope.OrganizationRoles,
+    UserScope.Roles,
+  ];
+}
