@@ -3,11 +3,16 @@ import type { SelectedOrganization } from "./types.js";
 import { SELECTED_ORG_COOKIE } from "./utils/constants.js";
 
 export const SelectedOrganizationHandler: SelectedOrganization = {
-  set(organizationId: string, secure: boolean, overwrite = false): void {
+  set(
+    organizationId: string,
+    secure: boolean,
+    overwrite = false,
+    domain?: string,
+  ): void {
     if (!overwrite && SelectedOrganizationHandler.isSet()) {
       return;
     }
-    cookies().set(SELECTED_ORG_COOKIE, organizationId, { secure });
+    cookies().set(SELECTED_ORG_COOKIE, organizationId, { secure, domain });
   },
   get(): string | undefined {
     const value = cookies().get(SELECTED_ORG_COOKIE);
