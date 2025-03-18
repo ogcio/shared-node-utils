@@ -9,6 +9,7 @@ import type { Logger } from "pino";
 import { hasPermissions } from "./check-permissions.js";
 import { addInactivePublicServantScope } from "./inactive-public-servant.js";
 import { parseContext, parseUserInfo } from "./parse-logto-context.js";
+import { SelectedOrganizationHandler } from "./selected-organization-handler.js";
 import type {
   AuthSessionContext,
   AuthSessionUserInfo,
@@ -93,7 +94,7 @@ export class UserContextHandler implements UserContext {
     }
     const parsed = parseUserInfo(
       { ...context, userInfo: context.userInfo },
-      this.organizationId,
+      this.getOrganizationId(),
     );
 
     if (!parsed) {
@@ -157,16 +158,30 @@ export class UserContextHandler implements UserContext {
     if (!resource && isCitizen) {
       throw new Error("As a citizen a resource must be set");
     }
-    if (resource && (isCitizen || !this.organizationId)) {
+
+    const organizationId = this.getOrganizationId();
+    if (resource && (isCitizen || !organizationId)) {
       return getAccessToken(this.config, resource);
     }
 
-    if (this.organizationId) {
-      return getOrganizationToken(this.config, this.organizationId);
+    if (organizationId) {
+      return getOrganizationToken(this.config, organizationId);
     }
 
     throw new Error(
       "As a public servant one between resource and organization id must be set",
     );
+  }
+
+  private getOrganizationId(): string | undefined {
+    try {
+      if (!SelectedOrganizationHandler.isSet()) {
+        return this.organizationId;
+      }
+
+      return SelectedOrganizationHandler.get();
+    } catch {
+      return this.organizationId;
+    }
   }
 }
