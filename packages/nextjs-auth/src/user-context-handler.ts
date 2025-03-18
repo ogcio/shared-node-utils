@@ -94,7 +94,7 @@ export class UserContextHandler implements UserContext {
     }
     const parsed = parseUserInfo(
       { ...context, userInfo: context.userInfo },
-      this.organizationId,
+      this.getOrganizationId(),
     );
 
     if (!parsed) {
@@ -159,8 +159,7 @@ export class UserContextHandler implements UserContext {
       throw new Error("As a citizen a resource must be set");
     }
 
-    const organizationId =
-      SelectedOrganizationHandler.get() ?? this.organizationId;
+    const organizationId = this.getOrganizationId();
     if (resource && (isCitizen || !organizationId)) {
       return getAccessToken(this.config, resource);
     }
@@ -172,5 +171,13 @@ export class UserContextHandler implements UserContext {
     throw new Error(
       "As a public servant one between resource and organization id must be set",
     );
+  }
+
+  private getOrganizationId(): string | undefined {
+    if (!SelectedOrganizationHandler.isSet()) {
+      return this.organizationId;
+    }
+
+    return SelectedOrganizationHandler.get();
   }
 }
