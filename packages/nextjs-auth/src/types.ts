@@ -49,7 +49,12 @@ export interface UserContext {
 }
 
 export interface SelectedOrganization {
-  set(organizationId: string, secure: boolean, overwrite?: boolean): void;
+  set(
+    organizationId: string,
+    secure: boolean,
+    overwrite?: boolean,
+    domain?: string,
+  ): void;
   get(): string | undefined;
   delete(): void;
   isSet(): boolean;
