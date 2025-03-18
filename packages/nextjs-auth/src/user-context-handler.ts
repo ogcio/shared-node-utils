@@ -174,10 +174,14 @@ export class UserContextHandler implements UserContext {
   }
 
   private getOrganizationId(): string | undefined {
-    if (!SelectedOrganizationHandler.isSet()) {
+    try {
+      if (!SelectedOrganizationHandler.isSet()) {
+        return this.organizationId;
+      }
+
+      return SelectedOrganizationHandler.get();
+    } catch {
       return this.organizationId;
     }
-
-    return SelectedOrganizationHandler.get();
   }
 }
