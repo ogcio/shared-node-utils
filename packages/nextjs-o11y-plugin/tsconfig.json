@@ -1,0 +1,14 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "composite": true,
+    "strictNullChecks": true,
+    "jsx": "preserve",
+    "outDir": "dist",
+    "rootDir": "src",
+  },
+  "include": ["src"],
+}
