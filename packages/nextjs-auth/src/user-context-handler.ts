@@ -87,7 +87,7 @@ export class UserContextHandler implements UserContext {
    * cause it runs a network request against Logto
    * @returns The user info from Logto
    */
-  async getUser(): Promise<AuthSessionUserInfo> {
+  async getUser(addOriginalContext?: true): Promise<AuthSessionUserInfo> {
     const context = await this.getOriginalContext(true);
     if (!context.userInfo) {
       throw new Error("Cannot get user info");
@@ -99,6 +99,9 @@ export class UserContextHandler implements UserContext {
 
     if (!parsed) {
       throw new Error("Cannot parse user info");
+    }
+    if (addOriginalContext) {
+      parsed.originalContext = context;
     }
 
     return parsed;

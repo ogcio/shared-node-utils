@@ -9,6 +9,7 @@ export type AuthSessionUserInfo = {
   id: string;
   organizationData: Record<string, AuthSessionOrganizationInfo> | undefined;
   currentOrganization: AuthSessionOrganizationInfo | undefined;
+  originalContext?: LogtoContext;
 };
 
 export interface AuthSession {
@@ -34,7 +35,7 @@ export type AuthSessionContext = {
 };
 
 export interface UserContext {
-  getUser(): Promise<AuthSessionUserInfo>;
+  getUser(addOriginalContext?: true): Promise<AuthSessionUserInfo>;
   isAuthenticated(): Promise<boolean>;
   isPublicServant(): Promise<boolean>;
   isInactivePublicServant(): Promise<boolean>;
@@ -80,5 +81,6 @@ export function getDefaultScopes(): UserScope[] {
     UserScope.Organizations,
     UserScope.OrganizationRoles,
     UserScope.Roles,
+    UserScope.CustomData,
   ];
 }
