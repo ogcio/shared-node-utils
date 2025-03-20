@@ -10,7 +10,7 @@ This Fastify plugin enhances observability by:
 Ensure you have Fastify and `@ogcio/o11y-sdk-node` installed in your project with version >= `0.1.0-beta.8`
 
 ```sh
-npm install fastify @ogcio/o11y-sdk-node @ogcio/fastify-o11y-plugin
+npm install fastify @ogcio/o11y-sdk-node @ogcio/fastify-o11y
 ```
 
 ## Usage
@@ -19,7 +19,7 @@ Import and register the plugin in your Fastify server:
 
 ```ts
 import fastify from "fastify";
-import observabilityPlugin from "@ogcio/fastify-o11y-plugin";
+import observabilityPlugin from "@ogcio/fastify-o11y";
 
 const app = fastify();
 

@@ -1,6 +1,6 @@
 {
-  "name": "@ogcio/fastify-o11y-plugin",
-  "version": "0.0.2",
+  "name": "@ogcio/nextjs-o11y",
+  "version": "0.0.1",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "type": "module",
@@ -13,30 +13,21 @@
     "observability",
     "o11y",
     "ogcio",
-    "opentelemetry",
-    "fastify",
-    "fastify-plugin"
+    "opentelemetry"
   ],
   "author": {
     "name": "Andrea Bozzelli",
     "email": "andrea.bozzelli@nearform.com"
   },
   "license": "ISC",
-  "description": "Custom fastify plugin for OGCIO Observability",
-  "dependencies": {
-    "fastify-plugin": "^5.0.1"
-  },
+  "description": "Custom middleware for OGCIO Observability",
   "peerDependencies": {
-    "@ogcio/o11y-sdk-node": ">=0.1.0-beta.8",
-    "fastify": ">=5.0.0"
-  },
-  "devDependencies": {
-    "@fastify/cors": "^10.1.0"
+    "@opentelemetry/api": "1.x.x"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/ogcio/shared-node-utils.git",
-    "directory": "packages/fastify-o11y-plugin"
+    "directory": "packages/nextjs-o11y"
   },
-  "homepage": "https://github.com/ogcio/shared-node-utils/tree/main/packages/fastify-o11y-plugin#readme"
+  "homepage": "https://github.com/ogcio/shared-node-utils/tree/main/packages/nextjs-o11y#readme"
 }

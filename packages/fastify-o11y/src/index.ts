@@ -57,6 +57,6 @@ export default fp(
   },
   {
     fastify: "5.x",
-    name: "@ogcio/fastify-o11y-plugin",
+    name: "@ogcio/fastify-o11y",
   },
 );
