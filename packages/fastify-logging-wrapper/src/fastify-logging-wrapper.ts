@@ -42,10 +42,10 @@ export const initializeLoggingHooks = (server: FastifyInstance): void => {
   server.addHook("preHandler", (request, _reply, done) => {
     setLoggingContext({ request });
 
-    const request_parsed = parseFullLoggingRequest(request);
+    const requestParsed = parseFullLoggingRequest(request);
 
-    if (isObjectNotEmpty(request_parsed)) {
-      request.log.info({ request: request_parsed }, LogMessages.NewRequest);
+    if (isObjectNotEmpty(requestParsed)) {
+      request.log.info({ request: requestParsed }, LogMessages.NewRequest);
     } else {
       request.log.info(LogMessages.NewRequest);
     }
