@@ -36,6 +36,8 @@ describe("Logging entries when all works fine are the expected ones", () => {
       responseStatusCode: 200,
       expectedMessage: LogMessages.ApiTrack,
     });
+    const apiTrackEntry = JSON.parse(loggedRecords[2]);
+    assert.notNestedProperty(apiTrackEntry, "error");
   });
 });
 

@@ -26,11 +26,15 @@ import {
 const hyperidInstance = hyperid({ fixedLength: true, urlSafe: true });
 
 const isObjectNotEmpty = (value: object | undefined) => {
-  return !(
+  return (
     value &&
     typeof value === "object" &&
     !Array.isArray(value) &&
-    Object.keys(value).length > 0
+    Object.keys(
+      Object.fromEntries(
+        Object.entries(value).filter(([_, v]) => v !== undefined),
+      ),
+    ).length > 0
   );
 };
 
@@ -56,11 +60,8 @@ export const initializeLoggingHooks = (server: FastifyInstance): void => {
 
     const error = getPartialLoggingContextError();
     if (isObjectNotEmpty(error)) {
-      console.log("ERROR OBJECT BUT VALID", JSON.stringify(error));
       reply.log.info({ error: error }, LogMessages.ApiTrack);
     } else {
-      console.log("INVALID ERROR OBJECT", JSON.stringify(error));
-
       reply.log.info(LogMessages.ApiTrack);
     }
 
