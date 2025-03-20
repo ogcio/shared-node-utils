@@ -25,13 +25,31 @@ import {
 
 const hyperidInstance = hyperid({ fixedLength: true, urlSafe: true });
 
+const isObjectNotEmpty = (value: object | undefined) => {
+  return (
+    value &&
+    typeof value === "object" &&
+    !Array.isArray(value) &&
+    Object.keys(
+      Object.fromEntries(
+        Object.entries(value).filter(([_, v]) => v !== undefined),
+      ),
+    ).length > 0
+  );
+};
+
 export const initializeLoggingHooks = (server: FastifyInstance): void => {
   server.addHook("preHandler", (request, _reply, done) => {
     setLoggingContext({ request });
-    request.log.info(
-      { request: parseFullLoggingRequest(request) },
-      LogMessages.NewRequest,
-    );
+
+    const requestParsed = parseFullLoggingRequest(request);
+
+    if (isObjectNotEmpty(requestParsed)) {
+      request.log.info({ request: requestParsed }, LogMessages.NewRequest);
+    } else {
+      request.log.info(LogMessages.NewRequest);
+    }
+
     done();
   });
 
@@ -39,10 +57,14 @@ export const initializeLoggingHooks = (server: FastifyInstance): void => {
     setLoggingContext({ response: reply });
     reply.log.info(LogMessages.Response);
     // Include error in API Track if exists
-    reply.log.info(
-      { error: getPartialLoggingContextError() },
-      LogMessages.ApiTrack,
-    );
+
+    const error = getPartialLoggingContextError();
+    if (isObjectNotEmpty(error)) {
+      reply.log.info({ error: error }, LogMessages.ApiTrack);
+    } else {
+      reply.log.info(LogMessages.ApiTrack);
+    }
+
     resetLoggingContext();
     done();
   });
