@@ -16,18 +16,19 @@ export default function o11y<
 
     const exposedHeaders = res.headers.get(ACCESS_CONTROL_EXPOSE_HEADERS);
 
-    if (exposedHeaders) {
-      if (exposedHeaders.toString().includes(X_TRACE_ID)) {
-        return;
-      }
-
-      res.headers.set(
-        ACCESS_CONTROL_EXPOSE_HEADERS,
-        `${X_TRACE_ID}, ${exposedHeaders}`,
-      );
-    } else {
+    if (!exposedHeaders) {
       res.headers.set(ACCESS_CONTROL_EXPOSE_HEADERS, X_TRACE_ID);
+      return;
     }
+
+    if (exposedHeaders.toString().includes(X_TRACE_ID)) {
+      return;
+    }
+
+    res.headers.set(
+      ACCESS_CONTROL_EXPOSE_HEADERS,
+      `${X_TRACE_ID}, ${exposedHeaders}`,
+    );
   } catch (error) {
     console.error("Observability Middleware Error:", error);
   }
