@@ -25,13 +25,27 @@ import {
 
 const hyperidInstance = hyperid({ fixedLength: true, urlSafe: true });
 
+const isObjectNotEmpty = (value: object | undefined) => {
+  return !(
+    value &&
+    typeof value === "object" &&
+    !Array.isArray(value) &&
+    Object.keys(value).length > 0
+  );
+};
+
 export const initializeLoggingHooks = (server: FastifyInstance): void => {
   server.addHook("preHandler", (request, _reply, done) => {
     setLoggingContext({ request });
-    request.log.info(
-      { request: parseFullLoggingRequest(request) },
-      LogMessages.NewRequest,
-    );
+
+    const request_parsed = parseFullLoggingRequest(request);
+
+    if (isObjectNotEmpty(request_parsed)) {
+      request.log.info({ request: request_parsed }, LogMessages.NewRequest);
+    } else {
+      request.log.info(LogMessages.NewRequest);
+    }
+
     done();
   });
 
@@ -39,10 +53,17 @@ export const initializeLoggingHooks = (server: FastifyInstance): void => {
     setLoggingContext({ response: reply });
     reply.log.info(LogMessages.Response);
     // Include error in API Track if exists
-    reply.log.info(
-      { error: getPartialLoggingContextError() },
-      LogMessages.ApiTrack,
-    );
+
+    const error = getPartialLoggingContextError();
+    if (isObjectNotEmpty(error)) {
+      console.log("ERROR OBJECT BUT VALID", JSON.stringify(error));
+      reply.log.info({ error: error }, LogMessages.ApiTrack);
+    } else {
+      console.log("INVALID ERROR OBJECT", JSON.stringify(error));
+
+      reply.log.info(LogMessages.ApiTrack);
+    }
+
     resetLoggingContext();
     done();
   });
