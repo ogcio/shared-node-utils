@@ -1,4 +1,4 @@
-# Next Observability Plugin
+# NextJS Observability
 
 This javascript plugin enhances observability by:
 
@@ -9,7 +9,7 @@ This javascript plugin enhances observability by:
 Ensure you have `@opentelemetry/api` installed in your project with version >= `1.x`
 
 ```sh
-npm install fastify @ogcio/nextjs-o11y-plugin
+npm install fastify @ogcio/nextjs-o11y
 ```
 
 ## Usage
@@ -36,7 +36,7 @@ export async function register() {
 Import and register the plugin in NextJS your `middleware.ts`:
 
 ```ts
-import o11y from "@ogcio/nextjs-o11y-plugin";
+import o11y from "@ogcio/nextjs-o11y";
 
 export default async function (request: NextRequest) {
   const response = NextResponse.next({
