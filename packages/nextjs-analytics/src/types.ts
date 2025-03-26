@@ -1,25 +1,16 @@
-import type {
-  BuildingBlocksSDK,
-  getBuildingBlockSDK,
-} from "@ogcio/building-blocks-sdk";
-import type {
-  GetAccessTokenParams,
-  GetOrganizationTokenParams,
-} from "@ogcio/building-blocks-sdk/dist/types";
+import { Analytics, AnalyticsOptions } from "@ogcio/analytics-sdk";
 
-type AnalyticsClientProps = ReturnType<typeof getBuildingBlockSDK>["analytics"];
 
-type AnalyticsConfigProps = Parameters<
-  typeof getBuildingBlockSDK
->["0"]["services"]["analytics"] &
-  (GetAccessTokenParams | GetOrganizationTokenParams);
+type AnalyticsClientProps = Analytics;
+
+type AnalyticsConfigProps = AnalyticsOptions;
 
 type AnalyticsTrackerProps = Parameters<
   AnalyticsClientProps["setTrackingContext"]
 >[0] & { pathname?: string; config: AnalyticsConfigProps };
 
 type TrackEventProps = Parameters<
-  BuildingBlocksSDK["analytics"]["track"]["event"]
+  Analytics["track"]["event"]
 >[0];
 
 export type {

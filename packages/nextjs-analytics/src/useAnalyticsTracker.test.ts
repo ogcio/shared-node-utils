@@ -9,14 +9,12 @@ const mockTrackPageView = vi.fn();
 
 // Mock BBClient
 vi.mock("./client", () => ({
-  BBClient: () => ({
-    analytics: {
+  AnalyticsClient: () => ({
       initClientTracker: mockInitClientTracker,
       setTrackingContext: mockSetTrackingContext,
       track: {
         pageView: mockTrackPageView,
       },
-    },
   }),
 }));
 
@@ -30,9 +28,6 @@ describe("AnalyticsTracker", () => {
     baseUrl: "https://api.example.com",
     organizationId: "org-123",
     dryRun: false,
-    applicationId: "app-123",
-    applicationSecret: "secret-123",
-    logtoOidcEndpoint: "https://auth.example.com",
   };
 
   beforeEach(() => {

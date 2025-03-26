@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef } from "react";
 import type { AnalyticsTrackerProps } from ".";
-import { BBClient } from "./client";
+import { AnalyticsClient } from "./client";
 
 export const AnalyticsTracker = ({
   config,
@@ -13,7 +13,7 @@ export const AnalyticsTracker = ({
   const isInitialLoad = useRef(true);
   const isInitialized = useRef(false);
 
-  const client = BBClient(config).analytics;
+  const client = AnalyticsClient(config);
 
   const initAnalytics = useCallback(
     async (userId?: string) => {
@@ -24,7 +24,7 @@ export const AnalyticsTracker = ({
         // TODO: Handle error
       }
     },
-    [client, customDimensions],
+    [client, customDimensions]
   );
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: Not needed
