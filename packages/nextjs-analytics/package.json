@@ -15,17 +15,17 @@
     "dist"
   ],
   "dependencies": {
-    "@ogcio/analytics-sdk": "0.1.0-beta.15",
+    "@ogcio/analytics-sdk": "0.1.0-beta.16",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
   },
   "devDependencies": {
     "@testing-library/react": "^16.1.0",
-    "@types/node": "22.10.2",
+    "@types/node": "22.14.1",
     "@types/react": "18.3.12",
     "@types/react-dom": "18.3.1",
     "@vitejs/plugin-react": "^4.3.4",
-    "jsdom": "^25.0.1",
+    "jsdom": "^26.1.0",
     "typescript": "^5.7.2"
   }
 }
