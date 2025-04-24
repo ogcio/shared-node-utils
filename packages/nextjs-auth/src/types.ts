@@ -47,6 +47,7 @@ export interface UserContext {
   getContext(): Promise<AuthSessionContext>;
   getTokenFromContext(): Promise<string | undefined>;
   getToken(resource?: string): Promise<string>;
+  isCitizenOnboarded(): Promise<boolean>;
 }
 
 export interface SelectedOrganization {
