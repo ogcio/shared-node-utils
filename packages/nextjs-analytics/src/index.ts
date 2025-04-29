@@ -3,3 +3,4 @@ export * from "./trackNavigationEvent";
 export * from "./trackEvent";
 export * from "./types";
 export * from "./const";
+export * from "./client";
