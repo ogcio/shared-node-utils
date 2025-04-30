@@ -18,7 +18,8 @@ export const AnalyticsTracker = ({
   const initAnalytics = useCallback(
     async (userId?: string) => {
       try {
-        await client.initClientTracker();
+        // do not track page view on init, as it will be tracked by the useEffect below
+        await client.initClientTracker({ trackPageView: false });
         client.setTrackingContext({ customDimensions, userId });
       } catch {
         // TODO: Handle error
@@ -46,7 +47,7 @@ export const AnalyticsTracker = ({
 
     client.track
       .pageView({
-        event: { title: pathname ?? "" },
+        event: { title: document.title ?? pathname ?? "" },
       })
       .catch(() => {
         // TODO: Handle error
