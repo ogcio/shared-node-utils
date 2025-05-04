@@ -1,6 +1,6 @@
 "use client";
 
-import { Analytics, AnalyticsOptions } from "@ogcio/analytics-sdk";
+import { Analytics, type AnalyticsOptions } from "@ogcio/analytics-sdk";
 import { createContext, useContext, useEffect, useMemo } from "react";
 
 type AnalyticsContextValue = {
@@ -60,9 +60,6 @@ const AnalyticsProvider = ({
   );
 };
 
-type EventParameters = Parameters<
-  InstanceType<typeof Analytics>["track"]["event"]
->;
 type PageViewParameters = Parameters<
   InstanceType<typeof Analytics>["track"]["pageView"]
 >;

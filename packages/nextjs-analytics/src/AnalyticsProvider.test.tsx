@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { render, act } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import { AnalyticsProvider, useAnalytics } from "./AnalyticsProvider"; // adjust path as needed
-import { AnalyticsOptions } from "@ogcio/analytics-sdk";
+import type { AnalyticsOptions } from "@ogcio/analytics-sdk";
 
 vi.mock("@ogcio/analytics-sdk", () => {
   const initClientTracker = vi.fn().mockResolvedValue(undefined);
@@ -64,7 +64,7 @@ describe("AnalyticsProvider", () => {
       render(
         <AnalyticsProvider config={config}>
           <div>Test</div>
-        </AnalyticsProvider>
+        </AnalyticsProvider>,
       );
     });
 
@@ -93,7 +93,7 @@ describe("AnalyticsProvider", () => {
       useEffect(() => {
         trackEvent({ event: { category: "interactions", action: "click" } });
         pageView({ event: { title: "Test Page" } });
-      }, []);
+      }, [trackEvent, pageView]);
 
       return <div>Hook Test</div>;
     };
@@ -102,7 +102,7 @@ describe("AnalyticsProvider", () => {
       render(
         <AnalyticsProvider config={config}>
           <TestComponent />
-        </AnalyticsProvider>
+        </AnalyticsProvider>,
       );
     });
 
@@ -136,7 +136,7 @@ describe("AnalyticsProvider", () => {
     const { unmount } = render(
       <AnalyticsProvider config={config}>
         <TestComponent />
-      </AnalyticsProvider>
+      </AnalyticsProvider>,
     );
 
     expect(setTrackingContext).toHaveBeenCalledWith({
