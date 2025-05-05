@@ -1,13 +1,13 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { trackEvent } from "./trackEvent";
-import type { AnalyticsClientProps } from "./types";
+import type { Analytics } from "@ogcio/analytics-sdk";
 
 const mockTrackEvent = vi.fn().mockResolvedValue({
   message: "success",
   status: 200,
 });
 
-const mockClient: Partial<AnalyticsClientProps> = {
+const mockClient: Partial<Analytics> = {
   // @ts-expect-error
   track: {
     event: mockTrackEvent,

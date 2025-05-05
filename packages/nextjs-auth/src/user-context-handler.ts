@@ -16,7 +16,10 @@ import type {
   GetContextParams,
   UserContext,
 } from "./types.js";
-import { DEFAULT_LOGIN_PATH } from "./utils/constants.js";
+import {
+  DEFAULT_LOGIN_PATH,
+  ROLE_NAME_ONBOARDED_CITIZEN,
+} from "./utils/constants.js";
 import { tokenMutex } from "./tokenService.js";
 
 export class UserContextHandler implements UserContext {
@@ -176,6 +179,20 @@ export class UserContextHandler implements UserContext {
         "As a public servant one between resource and organization id must be set",
       );
     });
+  }
+
+  async isCitizenOnboarded() {
+    if (!(await this.isCitizen())) {
+      throw new Error("only citizens");
+    }
+
+    const context = await this.getOriginalContext(true);
+    const isOnboarded = Boolean(
+      context.userInfo?.roles?.some(
+        (role) => role === ROLE_NAME_ONBOARDED_CITIZEN,
+      ),
+    );
+    return isOnboarded;
   }
 
   private getOrganizationId(): string | undefined {
