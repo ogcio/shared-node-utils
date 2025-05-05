@@ -1,7 +1,13 @@
 "use client";
 
-import { Analytics, type AnalyticsOptions } from "@ogcio/analytics-sdk";
+import {
+  Analytics,
+  ConsoleLogger,
+  type AnalyticsOptions,
+} from "@ogcio/analytics-sdk";
 import { createContext, useContext, useEffect, useMemo } from "react";
+
+type AnalyticsClientSideOptions = Omit<AnalyticsOptions, "getTokenFn">;
 
 type AnalyticsContextValue = {
   analyticsInstance?: Analytics;
@@ -12,8 +18,15 @@ const AnalyticsContext = createContext<AnalyticsContextValue>({
 });
 
 let analytics: Analytics;
-function getAnalytics(analyticsConfig: AnalyticsOptions) {
+function getAnalytics(analyticsConfig: AnalyticsClientSideOptions) {
   if (analytics) return analytics;
+
+  if (!analyticsConfig.logger) {
+    analyticsConfig.logger = new ConsoleLogger({
+      level: "warn",
+    });
+  }
+
   analytics = new Analytics(analyticsConfig);
 
   return analytics;
@@ -23,7 +36,7 @@ const AnalyticsProvider = ({
   config,
   children,
 }: {
-  config: AnalyticsOptions;
+  config: AnalyticsClientSideOptions;
   children: React.ReactNode;
 }) => {
   const context = useMemo(() => {

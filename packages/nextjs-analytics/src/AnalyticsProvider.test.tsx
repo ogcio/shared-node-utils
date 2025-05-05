@@ -9,6 +9,9 @@ vi.mock("@ogcio/analytics-sdk", () => {
   const trackPageView = vi.fn();
   const trackEvent = vi.fn();
   const setTrackingContext = vi.fn();
+  const ConsoleLogger = vi.fn().mockImplementation(() => ({
+    setLevel: vi.fn(),
+  }));
 
   const MockAnalytics = vi.fn().mockImplementation(() => ({
     initClientTracker,
@@ -20,6 +23,7 @@ vi.mock("@ogcio/analytics-sdk", () => {
   }));
 
   return {
+    ConsoleLogger,
     Analytics: MockAnalytics,
     __esModule: true,
     __mocks__: {
