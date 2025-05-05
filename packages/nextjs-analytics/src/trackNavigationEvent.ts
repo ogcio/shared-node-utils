@@ -1,19 +1,29 @@
-import {
-  type AnalyticsClientProps,
-  NAVIGATION_EVENT_CATEGORY,
-  NAVIGATION_EVENT_NAME,
-} from ".";
-import { trackEvent } from "./trackEvent";
+import type { Analytics } from "@ogcio/analytics-sdk";
+import type { TrackPageViewProps } from "./types";
 
 export const trackNavigationEvent =
-  (client: AnalyticsClientProps) =>
-  ({ pathname }: { pathname: string }) => {
-    trackEvent(client)({
-      event: {
-        action: pathname,
-        category: NAVIGATION_EVENT_CATEGORY,
-        name: NAVIGATION_EVENT_NAME,
-        value: 1,
-      },
-    });
+  (client: Analytics) =>
+  ({
+    pathname,
+    title,
+    contextOverride,
+    metadataOverride,
+  }: { pathname: string; title?: string } & Omit<
+    TrackPageViewProps,
+    "event"
+  >) => {
+    client.track
+      .pageView({
+        event: {
+          title: title || pathname,
+        },
+        metadataOverride: {
+          ...metadataOverride,
+          url: pathname,
+        },
+        contextOverride,
+      })
+      .catch(() => {
+        // TODO: Handle error
+      });
   };

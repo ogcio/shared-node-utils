@@ -1,22 +1,17 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { NAVIGATION_EVENT_CATEGORY, NAVIGATION_EVENT_NAME } from ".";
 import { trackNavigationEvent } from "./trackNavigationEvent";
-import type { AnalyticsClientProps } from "./types";
+import type { Analytics } from "@ogcio/analytics-sdk";
 
-const mockTrackEvent = vi.fn();
+const mockTrackPageView = vi.fn().mockResolvedValue({
+  message: "success",
+  status: 200,
+});
 
-vi.mock("./trackEvent", () => ({
-  trackEvent: () => mockTrackEvent,
-}));
-
-const mockClient: AnalyticsClientProps = {
+const mockClient: Partial<Analytics> = {
   // @ts-expect-error
   track: {
-    event: vi.fn(),
-    pageView: vi.fn(),
+    pageView: mockTrackPageView,
   },
-  initClientTracker: vi.fn(),
-  setTrackingContext: vi.fn(),
 };
 
 describe("trackNavigationEvent", () => {
@@ -24,18 +19,38 @@ describe("trackNavigationEvent", () => {
     vi.clearAllMocks();
   });
 
-  it("should track navigation event with correct parameters", () => {
-    const pathname = "/test-path";
+  it("should track event with correct parameters", async () => {
+    const testEvent = {
+      pathname: "/test-path",
+      title: "Test Title",
+    };
 
-    trackNavigationEvent(mockClient)({ pathname });
+    // @ts-expect-error
+    trackNavigationEvent(mockClient)(testEvent);
 
-    expect(mockTrackEvent).toHaveBeenCalledWith({
+    expect(mockTrackPageView).toHaveBeenCalledWith({
       event: {
-        action: pathname,
-        category: NAVIGATION_EVENT_CATEGORY,
-        name: NAVIGATION_EVENT_NAME,
-        value: 1,
+        title: testEvent.title,
+      },
+      metadataOverride: {
+        url: testEvent.pathname,
       },
     });
+  });
+
+  it("should handle tracking errors silently", async () => {
+    mockTrackPageView.mockRejectedValueOnce(new Error("Track failed"));
+    const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+
+    // @ts-expect-error
+    trackNavigationEvent(mockClient)({
+      pathname: "/test-path",
+      title: "Test Title",
+    });
+
+    await new Promise((resolve) => process.nextTick(resolve));
+
+    expect(consoleSpy).not.toHaveBeenCalled();
+    consoleSpy.mockRestore();
   });
 });
