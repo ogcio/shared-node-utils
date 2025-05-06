@@ -20,6 +20,7 @@ import {
   DEFAULT_LOGIN_PATH,
   ROLE_NAME_ONBOARDED_CITIZEN,
 } from "./utils/constants.js";
+import { tokenMutex } from "./tokenService.js";
 
 export class UserContextHandler implements UserContext {
   readonly config: LogtoNextConfig;
@@ -153,30 +154,31 @@ export class UserContextHandler implements UserContext {
     return context.accessToken;
   }
   /**
-   * It performs a network request to logto asking for a token for a specific resource or,
-   * if allowed, an organization token for the current organization
-   * @param resource The optional resource url you want to get a token for,
-   * if not set, an organization token is requested
-   * @returns
+   * Performs a network request to Logto for a token, serializing calls to prevent
+   * concurrent refresh-token races.
+   * @param resource Optional resource URL for access token; if omitted, requests an org token.
+   * @returns A Promise that resolves to the requested token string.
    */
   async getToken(resource?: string): Promise<string> {
-    const isCitizen = await this.isCitizen();
-    if (!resource && isCitizen) {
-      throw new Error("As a citizen a resource must be set");
-    }
+    return tokenMutex.runExclusive(async () => {
+      const isCitizen = await this.isCitizen();
+      if (!resource && isCitizen) {
+        throw new Error("As a citizen a resource must be set");
+      }
 
-    const organizationId = this.getOrganizationId();
-    if (resource && (isCitizen || !organizationId)) {
-      return getAccessToken(this.config, resource);
-    }
+      const organizationId = this.getOrganizationId();
+      if (resource && (isCitizen || !organizationId)) {
+        return getAccessToken(this.config, resource);
+      }
 
-    if (organizationId) {
-      return getOrganizationToken(this.config, organizationId);
-    }
+      if (organizationId) {
+        return getOrganizationToken(this.config, organizationId);
+      }
 
-    throw new Error(
-      "As a public servant one between resource and organization id must be set",
-    );
+      throw new Error(
+        "As a public servant one between resource and organization id must be set",
+      );
+    });
   }
 
   async isCitizenOnboarded() {

@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "rm -rf dist && tsc -w -p tsconfig.prod.json",
     "build": "rm -rf dist tsconfig.prod.tsbuildinfo tsconfig.tsbuildinfo && tsc -p tsconfig.prod.json",
-    "test": "echo \"Error: no test specified\" && exit 0",
+    "test": "vitest run --coverage --outputFile=results.xml",
     "prepublishOnly": "npm i && npm run build"
   },
   "type": "module",
