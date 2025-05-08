@@ -151,4 +151,56 @@ describe("AnalyticsProvider", () => {
 
     expect(setTrackingContext).toHaveBeenCalledWith({});
   });
+
+  test("handles error when initClientTracker fails", async () => {
+    const config: AnalyticsOptions = {
+      baseUrl: "https://example.com",
+      organizationId: "test-org",
+      trackingWebsiteId: "test-website",
+      dryRun: false,
+    };
+
+    initClientTracker.mockRejectedValueOnce(
+      new Error("initClientTracker error"),
+    );
+
+    await act(async () => {
+      render(
+        <AnalyticsProvider config={config}>
+          <div>Test</div>
+        </AnalyticsProvider>,
+      );
+    });
+
+    expect(initClientTracker).toHaveBeenCalledWith({ trackPageView: false });
+    expect(trackPageView).not.toHaveBeenCalled();
+  });
+
+  test("handles error when track.pageView fails", async () => {
+    const config: AnalyticsOptions = {
+      baseUrl: "https://example.com",
+      organizationId: "test-org",
+      trackingWebsiteId: "test-website",
+      dryRun: false,
+    };
+
+    trackPageView.mockImplementationOnce(() => {
+      throw new Error("track.pageView error");
+    });
+
+    await act(async () => {
+      render(
+        <AnalyticsProvider config={config}>
+          <div>Test</div>
+        </AnalyticsProvider>,
+      );
+    });
+
+    expect(initClientTracker).toHaveBeenCalledWith({ trackPageView: false });
+    expect(trackPageView).toHaveBeenCalledWith({
+      event: {
+        title: document.title,
+      },
+    });
+  });
 });
