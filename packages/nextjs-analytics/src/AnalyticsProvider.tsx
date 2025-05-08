@@ -47,21 +47,24 @@ const AnalyticsProvider = ({
 
   // Defer DOM operations until after hydration
   useEffect(() => {
-    if (typeof window !== "undefined" && context.analyticsInstance) {
-      try {
-        context.analyticsInstance
-          .initClientTracker({ trackPageView: false })
-          .then(() => {
-            return context.analyticsInstance.track.pageView({
-              event: {
-                title: window.document.title,
-              },
-            });
+    const initializeAnalytics = async () => {
+      if (typeof window !== "undefined" && context.analyticsInstance) {
+        try {
+          await context.analyticsInstance.initClientTracker({
+            trackPageView: false,
           });
-      } catch (e) {
-        console.error("Analytics: Error init client tracker", e);
+          await context.analyticsInstance.track.pageView({
+            event: {
+              title: window.document.title,
+            },
+          });
+        } catch (e) {
+          console.error("Analytics: Error during init", e);
+        }
       }
-    }
+    };
+
+    initializeAnalytics();
   }, [context.analyticsInstance]);
 
   return (
