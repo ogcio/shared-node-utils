@@ -52,7 +52,7 @@ const AnalyticsProvider = ({
         context.analyticsInstance
           .initClientTracker({ trackPageView: false })
           .then(() => {
-            context.analyticsInstance.track.pageView({
+            return context.analyticsInstance.track.pageView({
               event: {
                 title: window.document.title,
               },
