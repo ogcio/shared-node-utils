@@ -53,10 +53,10 @@ Use the `useAnalytics` hook to track events and page views:
 import { useAnalytics } from "@ogcio/nextjs-analytics";
 
 function MyComponent() {
-  const { trackEvent, pageView } = useAnalytics();
+  const analyticsClient = useAnalytics();
 
   const handleClick = () => {
-    trackEvent({
+    analyticsClient.trackEvent({
       event: {
         category: "button",
         action: "click",
@@ -66,12 +66,12 @@ function MyComponent() {
   };
 
   useEffect(() => {
-    pageView({
+    analyticsClient.pageView({
       event: {
         title: "My Page",
       },
     });
-  }, [pageView]);
+  }, []);
 
   return <button onClick={handleClick}>Click Me</button>;
 }
