@@ -38,6 +38,25 @@ describe("trackNavigationEvent", () => {
     });
   });
 
+    it("should track event with empty page title", async () => {
+    const testEvent = {
+      pathname: "/test-path",
+      title: "",
+    };
+
+    // @ts-expect-error
+    trackNavigationEvent(mockClient)(testEvent);
+
+    expect(mockTrackPageView).toHaveBeenCalledWith({
+      event: {
+        title: testEvent.pathname,
+      },
+      metadataOverride: {
+        url: testEvent.pathname,
+      },
+    });
+  });
+
   it("should handle tracking errors silently", async () => {
     mockTrackPageView.mockRejectedValueOnce(new Error("Track failed"));
     const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
