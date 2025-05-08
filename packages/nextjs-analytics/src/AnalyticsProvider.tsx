@@ -49,7 +49,6 @@ const AnalyticsProvider = ({
   useEffect(() => {
     if (typeof window !== "undefined" && context.analyticsInstance) {
       try {
-        console.log("Analytics: Initializing client tracker");
         context.analyticsInstance
           .initClientTracker({ trackPageView: false })
           .then(() => {
@@ -60,8 +59,7 @@ const AnalyticsProvider = ({
             });
           });
       } catch (e) {
-        console.warn("Analytics: Error init client tracker");
-        console.error(e);
+        console.error("Analytics: Error init client tracker", e);
       }
     }
   }, [context.analyticsInstance]);
