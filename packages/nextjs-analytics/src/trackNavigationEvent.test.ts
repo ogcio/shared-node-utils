@@ -38,7 +38,7 @@ describe("trackNavigationEvent", () => {
     });
   });
 
-    it("should track event with empty page title", async () => {
+  it("should track event with empty page title", async () => {
     const testEvent = {
       pathname: "/test-path",
       title: "",
