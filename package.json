@@ -30,12 +30,12 @@
   "description": "Group of Node.js utils projects used in the OGCIO projects",
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",
-    "@commitlint/config-conventional": "^19.6.0",
-    "@types/node": "^22.10.2",
-    "@vitest/coverage-istanbul": "^2.1.8",
-    "commitlint": "^19.6.0",
+    "@commitlint/config-conventional": "^19.8.1",
+    "@types/node": "^22.15.17",
+    "@vitest/coverage-istanbul": "^3.1.3",
+    "commitlint": "^19.8.1",
     "husky": "^9.1.7",
-    "typescript": "^5.7.2",
-    "vitest": "^2.1.8"
+    "typescript": "^5.8.3",
+    "vitest": "^3.1.3"
   }
 }
