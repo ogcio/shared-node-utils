@@ -204,7 +204,7 @@ describe("AnalyticsProvider", () => {
     });
 
     expect(initClientTracker).toHaveBeenCalledWith({ trackPageView: false });
-    expect(trackPageView).toHaveBeenCalledWith({
+    expect(trackPageView).not.toHaveBeenCalledWith({
       event: {
         title: document.title,
       },
