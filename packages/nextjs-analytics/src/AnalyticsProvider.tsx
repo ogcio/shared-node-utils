@@ -6,6 +6,7 @@ import {
   type AnalyticsOptions,
 } from "@ogcio/analytics-sdk";
 import { createContext, useContext, useEffect, useMemo } from "react";
+import { usePathname, useSearchParams } from "next/navigation";
 
 type AnalyticsClientSideOptions = Omit<AnalyticsOptions, "getTokenFn">;
 
@@ -45,6 +46,9 @@ const AnalyticsProvider = ({
     };
   }, [config]);
 
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
   // Defer DOM operations until after hydration
   useEffect(() => {
     const initializeAnalytics = async () => {
@@ -66,6 +70,14 @@ const AnalyticsProvider = ({
 
     initializeAnalytics();
   }, [context.analyticsInstance]);
+
+  useEffect(() => {
+    context.analyticsInstance.track.pageView({
+      event: {
+        title: window.document.title,
+      },
+    });
+  }, [pathname, searchParams]);
 
   return (
     <AnalyticsContext.Provider value={context}>
