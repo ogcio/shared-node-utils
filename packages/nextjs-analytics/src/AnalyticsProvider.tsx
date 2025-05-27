@@ -2,9 +2,10 @@
 
 import {
   Analytics,
-  ConsoleLogger,
   type AnalyticsOptions,
+  ConsoleLogger,
 } from "@ogcio/analytics-sdk";
+import { usePathname, useSearchParams } from "next/navigation";
 import { createContext, useContext, useEffect, useMemo } from "react";
 
 type AnalyticsClientSideOptions = Omit<AnalyticsOptions, "getTokenFn">;
@@ -45,6 +46,9 @@ const AnalyticsProvider = ({
     };
   }, [config]);
 
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
   // Defer DOM operations until after hydration
   useEffect(() => {
     const initializeAnalytics = async () => {
@@ -52,11 +56,6 @@ const AnalyticsProvider = ({
         try {
           await context.analyticsInstance.initClientTracker({
             trackPageView: false,
-          });
-          await context.analyticsInstance.track.pageView({
-            event: {
-              title: window.document.title,
-            },
           });
         } catch (e) {
           console.error("Analytics: Error during init", e);
@@ -66,6 +65,20 @@ const AnalyticsProvider = ({
 
     initializeAnalytics();
   }, [context.analyticsInstance]);
+
+  useEffect(() => {
+    if (context.analyticsInstance?.isInitialized()) {
+      try {
+        context.analyticsInstance.track.pageView({
+          event: {
+            title: window.document.title,
+          },
+        });
+      } catch (e) {
+        console.error("Analytics: Error during route change", e);
+      }
+    }
+  }, [context.analyticsInstance, pathname, searchParams]);
 
   return (
     <AnalyticsContext.Provider value={context}>

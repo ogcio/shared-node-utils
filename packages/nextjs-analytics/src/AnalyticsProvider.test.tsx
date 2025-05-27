@@ -4,6 +4,8 @@ import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import { AnalyticsProvider, useAnalytics } from "./AnalyticsProvider"; // adjust path as needed
 import type { AnalyticsOptions } from "@ogcio/analytics-sdk";
 
+const isInitialized = vi.fn().mockReturnValue(true);
+
 vi.mock("@ogcio/analytics-sdk", () => {
   const initClientTracker = vi.fn().mockResolvedValue(undefined);
   const trackPageView = vi.fn();
@@ -20,6 +22,7 @@ vi.mock("@ogcio/analytics-sdk", () => {
       event: trackEvent,
     },
     setTrackingContext,
+    isInitialized,
   }));
 
   return {
@@ -68,7 +71,7 @@ describe("AnalyticsProvider", () => {
       render(
         <AnalyticsProvider config={config}>
           <div>Test</div>
-        </AnalyticsProvider>,
+        </AnalyticsProvider>
       );
     });
 
@@ -106,7 +109,7 @@ describe("AnalyticsProvider", () => {
       render(
         <AnalyticsProvider config={config}>
           <TestComponent />
-        </AnalyticsProvider>,
+        </AnalyticsProvider>
       );
     });
 
@@ -140,7 +143,7 @@ describe("AnalyticsProvider", () => {
     const { unmount } = render(
       <AnalyticsProvider config={config}>
         <TestComponent />
-      </AnalyticsProvider>,
+      </AnalyticsProvider>
     );
 
     expect(setTrackingContext).toHaveBeenCalledWith({
@@ -160,15 +163,17 @@ describe("AnalyticsProvider", () => {
       dryRun: false,
     };
 
+    isInitialized.mockReturnValueOnce(false);
+
     initClientTracker.mockRejectedValueOnce(
-      new Error("initClientTracker error"),
+      new Error("initClientTracker error")
     );
 
     await act(async () => {
       render(
         <AnalyticsProvider config={config}>
           <div>Test</div>
-        </AnalyticsProvider>,
+        </AnalyticsProvider>
       );
     });
 
@@ -188,16 +193,18 @@ describe("AnalyticsProvider", () => {
       throw new Error("track.pageView error");
     });
 
+    isInitialized.mockReturnValueOnce(false);
+
     await act(async () => {
       render(
         <AnalyticsProvider config={config}>
           <div>Test</div>
-        </AnalyticsProvider>,
+        </AnalyticsProvider>
       );
     });
 
     expect(initClientTracker).toHaveBeenCalledWith({ trackPageView: false });
-    expect(trackPageView).toHaveBeenCalledWith({
+    expect(trackPageView).not.toHaveBeenCalledWith({
       event: {
         title: document.title,
       },
