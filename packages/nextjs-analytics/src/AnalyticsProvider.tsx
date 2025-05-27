@@ -72,12 +72,18 @@ const AnalyticsProvider = ({
   }, [context.analyticsInstance]);
 
   useEffect(() => {
-    context.analyticsInstance.track.pageView({
-      event: {
-        title: window.document.title,
-      },
-    });
-  }, [pathname, searchParams]);
+    if (context.analyticsInstance?.isInitialized()) {
+      try {
+        context.analyticsInstance.track.pageView({
+          event: {
+            title: window.document.title,
+          },
+        });
+      } catch (e) {
+        console.error("Analytics: Error during route change", e);
+      }
+    }
+  }, [context.analyticsInstance, pathname, searchParams]);
 
   return (
     <AnalyticsContext.Provider value={context}>
