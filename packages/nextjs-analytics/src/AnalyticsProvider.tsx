@@ -68,7 +68,6 @@ const AnalyticsProvider = ({
 
   useEffect(() => {
     if (context.analyticsInstance?.isInitialized()) {
-      console.log(`PATH NAME = ${pathname} SEARCH PARAMS ${searchParams}`);
       try {
         context.analyticsInstance.track.pageView({
           event: {
