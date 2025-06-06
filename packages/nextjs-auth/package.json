@@ -1,6 +1,6 @@
 {
   "name": "@ogcio/nextjs-auth",
-  "version": "4.0.6",
+  "version": "5.0.0",
   "private": false,
   "main": "dist/index.js",
   "scripts": {
@@ -14,15 +14,20 @@
     "@logto/next": "3.5.0",
     "@ogcio/nextjs-logging-wrapper": "^14.2.9",
     "@ogcio/shared-errors": "^1.1.0",
-    "http-errors": "^2.0.0",
-    "next": "14.2.5",
+    "http-errors": "^2.0.0"
+  },
+  "peerDependencies": {
+    "next": "^14.2.5",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
   },
   "devDependencies": {
     "@types/http-errors": "2.0.4",
     "@types/react": "18.3.18",
-    "@types/react-dom": "18.3.5"
+    "@types/react-dom": "18.3.5",
+    "next": "^14.2.5",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
   },
   "files": [
     "dist",
