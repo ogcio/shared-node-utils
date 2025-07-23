@@ -15,7 +15,7 @@
  */
 class Mutex {
   private _locking: Promise<void> = Promise.resolve();
-  private _locks: number = 0;
+  private _locks = 0;
 
   /**
    * Acquires the lock, runs the given function, and releases the lock.
@@ -23,8 +23,7 @@ class Mutex {
    */
   async runExclusive<T>(fn: () => Promise<T>): Promise<T> {
     this._locks++;
-    console.log("runExclusive tokenMutex locks:", this._locks)
-    let resolveLock: () => void;
+    let resolveLock: (() => void) | undefined;
     const willLock = new Promise<void>((resolve) => {
       resolveLock = resolve;
     });
@@ -39,7 +38,9 @@ class Mutex {
       return await fn();
     } finally {
       // Release our lock
-      resolveLock!();
+      if (resolveLock) {
+        resolveLock();
+      }
       this._locks--;
     }
   }
