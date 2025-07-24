@@ -1,6 +1,7 @@
 import type { LogtoContext, LogtoNextConfig } from "@logto/next";
 import {
   getAccessToken,
+  getAccessTokenRSC,
   getLogtoContext,
   getOrganizationToken,
 } from "@logto/next/server-actions";
@@ -21,6 +22,7 @@ import {
   ROLE_NAME_ONBOARDED_CITIZEN,
 } from "./utils/constants.js";
 import { tokenMutex } from "./tokenService.js";
+import { createRemoteJWKSet, JWTPayload, jwtVerify } from "jose";
 
 export class UserContextHandler implements UserContext {
   readonly config: LogtoNextConfig;
@@ -193,6 +195,36 @@ export class UserContextHandler implements UserContext {
       ),
     );
     return isOnboarded;
+  }
+
+  async getSigninMethodRSC(): Promise<string | undefined> {
+    try {
+      const token = await getAccessTokenRSC(this.config, this.config.resources?.[0])
+      const jwkEndpoint = new URL('/oidc/jwks', this.config.endpoint).toString();
+      const oidcEndpoint = new URL('/oidc', this.config.endpoint).toString();
+      const payload = await this.decodeToken(token, {
+          jwkEndpoint,
+          oidcEndpoint,
+      })
+      return payload?.signInMethod;
+    } catch(error) {
+      this.logger.error({ error }, "Cannot get the signin method");
+    }
+  }
+
+  private async decodeToken(
+    token: string,
+    config: {
+      jwkEndpoint: string;
+      oidcEndpoint: string;
+    }
+  ): Promise<JWTPayload & { signInMethod?: string; }> {
+    // Reference: https://docs.logto.io/docs/recipes/protect-your-api/node/
+    const jwks = createRemoteJWKSet(new URL(config.jwkEndpoint));
+    const { payload } = await jwtVerify(token, jwks, {
+      issuer: config.oidcEndpoint,
+    });
+    return payload;
   }
 
   private getOrganizationId(): string | undefined {
