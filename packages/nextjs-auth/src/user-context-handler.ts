@@ -208,7 +208,9 @@ export class UserContextHandler implements UserContext {
       })
       return payload?.signInMethod;
     } catch(error) {
-      this.logger.error({ error }, "Cannot get the signin method");
+      if ((error as any).code !== "not_authenticated") {
+        this.logger.error({ error }, "Cannot get the signin method");
+      }
     }
   }
 
