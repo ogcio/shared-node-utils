@@ -48,6 +48,7 @@ export interface UserContext {
   getTokenFromContext(): Promise<string | undefined>;
   getToken(resource?: string): Promise<string>;
   isCitizenOnboarded(): Promise<boolean>;
+  getSigninMethodRSC(): Promise<string | undefined>;
 }
 
 export interface SelectedOrganization {
