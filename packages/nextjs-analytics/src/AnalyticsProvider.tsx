@@ -66,6 +66,7 @@ const AnalyticsProvider = ({
     initializeAnalytics();
   }, [context.analyticsInstance]);
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: although pathname and searchParams are not used within the hook, they determine a navigation event that we want to track
   useEffect(() => {
     if (context.analyticsInstance?.isInitialized()) {
       try {

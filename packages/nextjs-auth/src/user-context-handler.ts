@@ -22,7 +22,7 @@ import {
   ROLE_NAME_ONBOARDED_CITIZEN,
 } from "./utils/constants.js";
 import { tokenMutex } from "./tokenService.js";
-import { createRemoteJWKSet, JWTPayload, jwtVerify } from "jose";
+import { createRemoteJWKSet, type JWTPayload, jwtVerify } from "jose";
 
 export class UserContextHandler implements UserContext {
   readonly config: LogtoNextConfig;
@@ -199,15 +199,21 @@ export class UserContextHandler implements UserContext {
 
   async getSigninMethodRSC(): Promise<string | undefined> {
     try {
-      const token = await getAccessTokenRSC(this.config, this.config.resources?.[0])
-      const jwkEndpoint = new URL('/oidc/jwks', this.config.endpoint).toString();
-      const oidcEndpoint = new URL('/oidc', this.config.endpoint).toString();
+      const token = await getAccessTokenRSC(
+        this.config,
+        this.config.resources?.[0],
+      );
+      const jwkEndpoint = new URL(
+        "/oidc/jwks",
+        this.config.endpoint,
+      ).toString();
+      const oidcEndpoint = new URL("/oidc", this.config.endpoint).toString();
       const payload = await this.decodeToken(token, {
-          jwkEndpoint,
-          oidcEndpoint,
-      })
+        jwkEndpoint,
+        oidcEndpoint,
+      });
       return payload?.signInMethod;
-    } catch(error) {
+    } catch (error) {
       if ((error as any).code !== "not_authenticated") {
         this.logger.error({ error }, "Cannot get the signin method");
       }
@@ -219,8 +225,8 @@ export class UserContextHandler implements UserContext {
     config: {
       jwkEndpoint: string;
       oidcEndpoint: string;
-    }
-  ): Promise<JWTPayload & { signInMethod?: string; }> {
+    },
+  ): Promise<JWTPayload & { signInMethod?: string }> {
     // Reference: https://docs.logto.io/docs/recipes/protect-your-api/node/
     const jwks = createRemoteJWKSet(new URL(config.jwkEndpoint));
     const { payload } = await jwtVerify(token, jwks, {

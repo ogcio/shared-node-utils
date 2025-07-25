@@ -71,7 +71,7 @@ describe("AnalyticsProvider", () => {
       render(
         <AnalyticsProvider config={config}>
           <div>Test</div>
-        </AnalyticsProvider>
+        </AnalyticsProvider>,
       );
     });
 
@@ -109,7 +109,7 @@ describe("AnalyticsProvider", () => {
       render(
         <AnalyticsProvider config={config}>
           <TestComponent />
-        </AnalyticsProvider>
+        </AnalyticsProvider>,
       );
     });
 
@@ -143,7 +143,7 @@ describe("AnalyticsProvider", () => {
     const { unmount } = render(
       <AnalyticsProvider config={config}>
         <TestComponent />
-      </AnalyticsProvider>
+      </AnalyticsProvider>,
     );
 
     expect(setTrackingContext).toHaveBeenCalledWith({
@@ -166,14 +166,14 @@ describe("AnalyticsProvider", () => {
     isInitialized.mockReturnValueOnce(false);
 
     initClientTracker.mockRejectedValueOnce(
-      new Error("initClientTracker error")
+      new Error("initClientTracker error"),
     );
 
     await act(async () => {
       render(
         <AnalyticsProvider config={config}>
           <div>Test</div>
-        </AnalyticsProvider>
+        </AnalyticsProvider>,
       );
     });
 
@@ -199,7 +199,7 @@ describe("AnalyticsProvider", () => {
       render(
         <AnalyticsProvider config={config}>
           <div>Test</div>
-        </AnalyticsProvider>
+        </AnalyticsProvider>,
       );
     });
 
