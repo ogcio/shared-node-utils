@@ -5,7 +5,7 @@ import type { FastifySchemaValidationError } from "fastify/types/schema.js";
 import { SpanStatusCode } from "@opentelemetry/api";
 
 export type PluginConfig = {
-  traceErrors?: boolean;
+  traceErrors?: boolean; // set to `false` to disable error tracing, defaults to `true`.
 };
 
 const ACCESS_CONTROL_EXPOSE_HEADERS = "access-control-expose-headers";
