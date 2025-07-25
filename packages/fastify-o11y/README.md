@@ -66,7 +66,22 @@ server.addHook("onResponse", (_request, reply, done) => {
 });
 ```
 
+### 3. Error Tracing
+
+The plugin traces errors by default using an `onError` hook:
+
+- Annotates OpenTelemetry spans with error and route details (error type, error code, route, method).
+- Adds validation error info (field, rule, message, schema path) if present.
+- Marks the span as error.
+- No PII is traced.
+
+Disable through the plugin config by explicitly setting `traceErrors` to false:
+```ts
+app.register(observabilityPlugin, { traceErrors: false });
+```
+
 ## How It Works
 
 1. **`onRequest` Hook**: Extracts the trace ID and attaches it to the response headers.
 2. **`onResponse` Hook**: Increments the HTTP response counter with the response status code.
+3. **`onError` Hook**: Extracts error info from FastifyError and injects them in current active span as spanAttributes, events, and exception.
