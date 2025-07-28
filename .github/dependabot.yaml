@@ -5,6 +5,7 @@ updates:
       - "/"
       - "/packages/fastify-error-handler"
       - "/packages/fastify-logging-wrapper"
+      - "/packages/fastify-o11y"
       - "/packages/shared-errors"
       - "/packages/api-auth"
     schedule:

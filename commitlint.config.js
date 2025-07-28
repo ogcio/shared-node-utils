@@ -9,6 +9,7 @@ module.exports = {
         "shared-errors",
         "fastify-error-handler",
         "fastify-logging-wrapper",
+        "fastify-o11y",
         "api-auth",
       ],
     ],
