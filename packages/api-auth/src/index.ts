@@ -10,6 +10,7 @@ type ExtractedUserData = {
   organizationId?: string;
   isM2MApplication: boolean;
   accessToken: string;
+  signInMethod?: string;
 };
 
 type MatchConfig = { method: "AND" | "OR" };
@@ -76,11 +77,13 @@ export const checkPermissions = async (
     sub,
     aud,
     client_id: clientId,
+    signInMethod
   } = payload as {
     scope: string;
     sub: string;
     aud: string;
     client_id: string;
+    signInMethod?: string;
   };
   const scopesMap = getMapFromScope(scope);
 
@@ -102,6 +105,7 @@ export const checkPermissions = async (
     organizationId: organizationId,
     accessToken: token,
     isM2MApplication: sub === clientId,
+    signInMethod
   };
 };
 
