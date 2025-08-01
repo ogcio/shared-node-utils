@@ -25,7 +25,7 @@
   "author": "samuele.salvatico@nearform.com",
   "license": "ISC",
   "dependencies": {
-    "pino": "^9.5.0",
+    "pino": "^9.7.0",
     "@ogcio/shared-errors": "^1.0.0"
   },
   "devDependencies": {
