@@ -1,6 +1,6 @@
 {
   "name": "@ogcio/nextjs-logging-wrapper",
-  "version": "14.2.10",
+  "version": "14.2.30",
   "description": "",
   "type": "module",
   "exports": {
@@ -25,11 +25,11 @@
   "author": "samuele.salvatico@nearform.com",
   "license": "ISC",
   "dependencies": {
-    "pino": "^9.5.0",
-    "@ogcio/shared-errors": "^1.0.0"
+    "pino": "^9.9.0",
+    "@ogcio/shared-errors": "^1.1.0"
   },
   "devDependencies": {
-    "next": "^14.2.5"
+    "next": "14.2.30"
   },
   "peerDependencies": {
     "next": ">=14.2"
