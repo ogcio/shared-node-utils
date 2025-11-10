@@ -39,7 +39,7 @@ const isObjectNotEmpty = (value: object | undefined) => {
 };
 
 export const initializeLoggingHooks = (server: FastifyInstance): void => {
-  server.addHook("preHandler", (request, _reply, done) => {
+  server.addHook("preParsing", (request, _reply, payload, done) => {
     setLoggingContext({ request });
 
     const requestParsed = parseFullLoggingRequest(request);
@@ -50,7 +50,7 @@ export const initializeLoggingHooks = (server: FastifyInstance): void => {
       request.log.info(LogMessages.NewRequest);
     }
 
-    done();
+    done(null, payload);
   });
 
   server.addHook("onResponse", (_req, reply, done) => {
