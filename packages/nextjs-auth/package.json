@@ -15,7 +15,7 @@
     "@ogcio/nextjs-logging-wrapper": "^14.2.9",
     "@ogcio/shared-errors": "^1.1.0",
     "http-errors": "^2.0.0",
-    "jose": "^5.9.6"
+    "jose": "^6.1.1"
   },
   "peerDependencies": {
     "next": ">=14.2",
@@ -23,7 +23,7 @@
     "react-dom": ">=18.3"
   },
   "devDependencies": {
-    "@types/http-errors": "2.0.4",
+    "@types/http-errors": "2.0.5",
     "@types/react": "18.3.18",
     "@types/react-dom": "18.3.5",
     "next": "^14.2.5",
