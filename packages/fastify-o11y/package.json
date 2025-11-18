@@ -23,14 +23,14 @@
   "license": "ISC",
   "description": "Custom fastify plugin for OGCIO Observability",
   "dependencies": {
-    "fastify-plugin": "^5.0.1"
+    "fastify-plugin": "^5.1.0"
   },
   "peerDependencies": {
     "@ogcio/o11y-sdk-node": ">=0.3.0",
     "fastify": ">=5.0.0"
   },
   "devDependencies": {
-    "@fastify/cors": "^10.1.0"
+    "@fastify/cors": "^11.1.0"
   },
   "repository": {
     "type": "git",
