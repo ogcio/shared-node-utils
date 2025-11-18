@@ -112,10 +112,23 @@ export class UserContextHandler implements UserContext {
 
     return parsed;
   }
-  async isAuthenticated(): Promise<boolean> {
-    const context = await this.getOriginalContext();
+  async isAuthenticated(forceLogin = true): Promise<boolean> {
+    if (forceLogin) {
+      const context = await this.getOriginalContext();
+      return Boolean(context.isAuthenticated);
+    }
 
-    return context.isAuthenticated ?? false;
+    const logtoParams = {
+      ...this.getContextParameters?.logtoContextParams,
+      fetchUserInfo: false,
+    };
+
+    try {
+      const context = await getLogtoContext(this.config, logtoParams);
+      return Boolean(context.isAuthenticated);
+    } catch {
+      return false;
+    }
   }
   /**
    * @returns True if the user has at least one of the publicServantExpectedRoles
