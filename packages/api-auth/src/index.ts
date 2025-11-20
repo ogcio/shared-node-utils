@@ -2,7 +2,7 @@ import { httpErrors } from "@fastify/sensible";
 import { getErrorMessage } from "@ogcio/shared-errors";
 import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import fp from "fastify-plugin";
-import { createRemoteJWKSet, jwtVerify } from "jose";
+import { type JWTPayload, createRemoteJWKSet, jwtVerify } from "jose";
 import { getMapFromScope, validatePermission } from "./utils.js";
 
 type ExtractedUserData = {
@@ -14,6 +14,18 @@ type ExtractedUserData = {
 };
 
 type MatchConfig = { method: "AND" | "OR" };
+
+type TokenVerifierFn = (params: {
+  toDecodeToken: string;
+  jwkEndpoint: string;
+  oidcEndpoint: string;
+}) => Promise<JWTPayload>;
+
+export type CheckPermissionsPluginOpts = {
+  jwkEndpoint: string;
+  oidcEndpoint: string;
+  tokenVerifierFn?: TokenVerifierFn;
+};
 
 declare module "fastify" {
   interface FastifyRequest {
@@ -33,11 +45,16 @@ const extractBearerToken = (authHeader: string) => {
 
 const decodeLogtoToken = async (
   token: string,
-  config: {
-    jwkEndpoint: string;
-    oidcEndpoint: string;
-  },
+  config: CheckPermissionsPluginOpts,
 ) => {
+  if (config.tokenVerifierFn) {
+    return config.tokenVerifierFn({
+      toDecodeToken: token,
+      jwkEndpoint: config.jwkEndpoint,
+      oidcEndpoint: config.oidcEndpoint,
+    });
+  }
+
   // Reference: https://docs.logto.io/docs/recipes/protect-your-api/node/
   const jwks = createRemoteJWKSet(new URL(config.jwkEndpoint));
   const { payload } = await jwtVerify(token, jwks, {
@@ -63,10 +80,7 @@ export const ensureUserCanAccessUser = (
 
 export const checkPermissions = async (
   authHeader: string,
-  config: {
-    jwkEndpoint: string;
-    oidcEndpoint: string;
-  },
+  config: CheckPermissionsPluginOpts,
   requiredPermissions: string[],
   matchConfig = { method: "OR" },
 ): Promise<ExtractedUserData> => {
@@ -77,7 +91,7 @@ export const checkPermissions = async (
     sub,
     aud,
     client_id: clientId,
-    signInMethod
+    signInMethod,
   } = payload as {
     scope: string;
     sub: string;
@@ -105,13 +119,8 @@ export const checkPermissions = async (
     organizationId: organizationId,
     accessToken: token,
     isM2MApplication: sub === clientId,
-    signInMethod
+    signInMethod,
   };
-};
-
-export type CheckPermissionsPluginOpts = {
-  jwkEndpoint: string;
-  oidcEndpoint: string;
 };
 
 export const checkPermissionsPlugin = async (
