@@ -2,7 +2,15 @@ import { httpErrors } from "@fastify/sensible";
 import { getErrorMessage } from "@ogcio/shared-errors";
 import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import fp from "fastify-plugin";
-import { type JWTPayload, createRemoteJWKSet, jwtVerify } from "jose";
+import {
+  type FlattenedJWSInput,
+  type JSONWebKeySet,
+  type JWSHeaderParameters,
+  type JWTPayload,
+  createLocalJWKSet,
+  createRemoteJWKSet,
+  jwtVerify,
+} from "jose";
 import { getMapFromScope, validatePermission } from "./utils.js";
 
 type ExtractedUserData = {
@@ -15,16 +23,13 @@ type ExtractedUserData = {
 
 type MatchConfig = { method: "AND" | "OR" };
 
-type TokenVerifierFn = (params: {
-  toDecodeToken: string;
-  jwkEndpoint: string;
-  oidcEndpoint: string;
-}) => Promise<JWTPayload>;
+type StoreLocalJwkSet = (keySet: JSONWebKeySet) => Promise<void>;
 
 export type CheckPermissionsPluginOpts = {
   jwkEndpoint: string;
   oidcEndpoint: string;
-  tokenVerifierFn?: TokenVerifierFn;
+  getLocalJwksFn?: () => JSONWebKeySet | undefined;
+  storeLocalJwkSetFn?: StoreLocalJwkSet;
 };
 
 declare module "fastify" {
@@ -43,23 +48,56 @@ const extractBearerToken = (authHeader: string) => {
   return token;
 };
 
+/**
+ * Reference: https://docs.logto.io/docs/recipes/protect-your-api/node/
+ * @param token
+ * @param config
+ * @returns JWTPayload
+ */
 const decodeLogtoToken = async (
   token: string,
   config: CheckPermissionsPluginOpts,
-) => {
-  if (config.tokenVerifierFn) {
-    return config.tokenVerifierFn({
-      toDecodeToken: token,
-      jwkEndpoint: config.jwkEndpoint,
-      oidcEndpoint: config.oidcEndpoint,
-    });
+): Promise<JWTPayload> => {
+  let jwksSet: JSONWebKeySet | undefined;
+
+  // check if local JSONWebKeySet retrieval function is provided
+  if (config.getLocalJwksFn) {
+    try {
+      jwksSet = config.getLocalJwksFn();
+    } catch {
+      // just ignoring the error to avoid changes in
+      // decodeLogtoToken behaviours
+    }
   }
 
-  // Reference: https://docs.logto.io/docs/recipes/protect-your-api/node/
-  const jwks = createRemoteJWKSet(new URL(config.jwkEndpoint));
-  const { payload } = await jwtVerify(token, jwks, {
+  let resolverFn:
+    | undefined
+    | ((
+        protectedHeader?: JWSHeaderParameters,
+        token?: FlattenedJWSInput,
+      ) => Promise<CryptoKey>);
+
+  if (!jwksSet) {
+    const remoteSet = createRemoteJWKSet(new URL(config.jwkEndpoint));
+    const remoteJwks = remoteSet.jwks();
+    if (config.storeLocalJwkSetFn && remoteJwks) {
+      try {
+        await config.storeLocalJwkSetFn(remoteJwks);
+      } catch {
+        // just ignoring the error to avoid changes in
+        // method behaviours
+      }
+    }
+    resolverFn = remoteSet;
+  } else {
+    const localJwkSet = createLocalJWKSet(jwksSet);
+    resolverFn = localJwkSet;
+  }
+
+  const { payload } = await jwtVerify(token, resolverFn, {
     issuer: config.oidcEndpoint,
   });
+
   return payload;
 };
 
