@@ -2,7 +2,15 @@ import { httpErrors } from "@fastify/sensible";
 import { getErrorMessage } from "@ogcio/shared-errors";
 import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import fp from "fastify-plugin";
-import { createRemoteJWKSet, jwtVerify } from "jose";
+import {
+  type FlattenedJWSInput,
+  type JSONWebKeySet,
+  type JWSHeaderParameters,
+  type JWTPayload,
+  createLocalJWKSet,
+  createRemoteJWKSet,
+  jwtVerify,
+} from "jose";
 import { getMapFromScope, validatePermission } from "./utils.js";
 
 type ExtractedUserData = {
@@ -14,6 +22,15 @@ type ExtractedUserData = {
 };
 
 type MatchConfig = { method: "AND" | "OR" };
+
+type StoreLocalJwkSet = (keySet: JSONWebKeySet) => Promise<void>;
+
+export type CheckPermissionsPluginOpts = {
+  jwkEndpoint: string;
+  oidcEndpoint: string;
+  getLocalJwksFn?: () => JSONWebKeySet | undefined;
+  storeLocalJwkSetFn?: StoreLocalJwkSet;
+};
 
 declare module "fastify" {
   interface FastifyRequest {
@@ -31,18 +48,56 @@ const extractBearerToken = (authHeader: string) => {
   return token;
 };
 
+/**
+ * Reference: https://docs.logto.io/docs/recipes/protect-your-api/node/
+ * @param token
+ * @param config
+ * @returns JWTPayload
+ */
 const decodeLogtoToken = async (
   token: string,
-  config: {
-    jwkEndpoint: string;
-    oidcEndpoint: string;
-  },
-) => {
-  // Reference: https://docs.logto.io/docs/recipes/protect-your-api/node/
-  const jwks = createRemoteJWKSet(new URL(config.jwkEndpoint));
-  const { payload } = await jwtVerify(token, jwks, {
+  config: CheckPermissionsPluginOpts,
+): Promise<JWTPayload> => {
+  let jwksSet: JSONWebKeySet | undefined;
+
+  // check if local JSONWebKeySet retrieval function is provided
+  if (config.getLocalJwksFn) {
+    try {
+      jwksSet = config.getLocalJwksFn();
+    } catch {
+      // just ignoring the error to avoid changes in
+      // decodeLogtoToken behaviours
+    }
+  }
+
+  let resolverFn:
+    | undefined
+    | ((
+        protectedHeader?: JWSHeaderParameters,
+        token?: FlattenedJWSInput,
+      ) => Promise<CryptoKey>);
+
+  if (!jwksSet) {
+    const remoteSet = createRemoteJWKSet(new URL(config.jwkEndpoint));
+    const remoteJwks = remoteSet.jwks();
+    if (config.storeLocalJwkSetFn && remoteJwks) {
+      try {
+        await config.storeLocalJwkSetFn(remoteJwks);
+      } catch {
+        // just ignoring the error to avoid changes in
+        // method behaviours
+      }
+    }
+    resolverFn = remoteSet;
+  } else {
+    const localJwkSet = createLocalJWKSet(jwksSet);
+    resolverFn = localJwkSet;
+  }
+
+  const { payload } = await jwtVerify(token, resolverFn, {
     issuer: config.oidcEndpoint,
   });
+
   return payload;
 };
 
@@ -63,10 +118,7 @@ export const ensureUserCanAccessUser = (
 
 export const checkPermissions = async (
   authHeader: string,
-  config: {
-    jwkEndpoint: string;
-    oidcEndpoint: string;
-  },
+  config: CheckPermissionsPluginOpts,
   requiredPermissions: string[],
   matchConfig = { method: "OR" },
 ): Promise<ExtractedUserData> => {
@@ -77,7 +129,7 @@ export const checkPermissions = async (
     sub,
     aud,
     client_id: clientId,
-    signInMethod
+    signInMethod,
   } = payload as {
     scope: string;
     sub: string;
@@ -105,13 +157,8 @@ export const checkPermissions = async (
     organizationId: organizationId,
     accessToken: token,
     isM2MApplication: sub === clientId,
-    signInMethod
+    signInMethod,
   };
-};
-
-export type CheckPermissionsPluginOpts = {
-  jwkEndpoint: string;
-  oidcEndpoint: string;
 };
 
 export const checkPermissionsPlugin = async (
