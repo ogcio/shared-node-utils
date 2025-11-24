@@ -22,7 +22,7 @@
         "fastify": "^5.1.0"
     },
     "devDependencies": {
-        "@types/http-errors": "^2.0.4"
+        "@types/http-errors": "^2.0.5"
     },
     "repository": {
         "type": "git",
