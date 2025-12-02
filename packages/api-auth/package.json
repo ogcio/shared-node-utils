@@ -4,8 +4,8 @@
   "main": "dist/index.js",
   "type": "module",
   "dependencies": {
-    "@aws-sdk/client-kms": "^3.936.0",
-    "@fastify/sensible": "6.0.3",
+    "@aws-sdk/client-kms": "^3.940.0",
+    "@fastify/sensible": "6.0.4",
     "@ogcio/shared-errors": "1.1.0",
     "fastify": "^5.6.2",
     "fastify-plugin": "^5.1.0",
