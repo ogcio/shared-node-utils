@@ -12,9 +12,9 @@
     "license": "ISC",
     "description": "",
     "dependencies": {
-        "http-errors": "^2.0.0"
+        "http-errors": "^2.0.1"
     },
     "devDependencies": {
-        "@types/http-errors": "^2.0.4"
+        "@types/http-errors": "^2.0.5"
     }
 }
