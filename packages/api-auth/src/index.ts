@@ -25,6 +25,11 @@ type MatchConfig = { method: "AND" | "OR" };
 
 type StoreLocalJwkSet = (keySet: JSONWebKeySet) => Promise<void>;
 
+type ResolverJwksFn = (
+  protectedHeader?: JWSHeaderParameters,
+  token?: FlattenedJWSInput,
+) => Promise<CryptoKey>;
+
 export type CheckPermissionsPluginOpts = {
   jwkEndpoint: string;
   oidcEndpoint: string;
@@ -58,9 +63,16 @@ const decodeLogtoToken = async (
   token: string,
   config: CheckPermissionsPluginOpts,
 ): Promise<JWTPayload> => {
+  const getVerifiedPayload = async (
+    resolverFn: ResolverJwksFn,
+  ): Promise<JWTPayload> => {
+    const { payload } = await jwtVerify(token, resolverFn, {
+      issuer: config.oidcEndpoint,
+    });
+    return payload;
+  };
+  // Check if local JSONWebKeySet retrieval function is provided
   let jwksSet: JSONWebKeySet | undefined;
-
-  // check if local JSONWebKeySet retrieval function is provided
   if (config.getLocalJwksFn) {
     try {
       jwksSet = config.getLocalJwksFn();
@@ -70,35 +82,27 @@ const decodeLogtoToken = async (
     }
   }
 
-  let resolverFn:
-    | undefined
-    | ((
-        protectedHeader?: JWSHeaderParameters,
-        token?: FlattenedJWSInput,
-      ) => Promise<CryptoKey>);
-
-  if (!jwksSet) {
-    const remoteSet = createRemoteJWKSet(new URL(config.jwkEndpoint));
-    const remoteJwks = remoteSet.jwks();
-    if (config.storeLocalJwkSetFn && remoteJwks) {
-      try {
-        await config.storeLocalJwkSetFn(remoteJwks);
-      } catch {
-        // just ignoring the error to avoid changes in
-        // method behaviours
-      }
-    }
-    resolverFn = remoteSet;
-  } else {
-    const localJwkSet = createLocalJWKSet(jwksSet);
-    resolverFn = localJwkSet;
+  // If we have a local JWKS set, use it
+  if (jwksSet) {
+    return getVerifiedPayload(createLocalJWKSet(jwksSet));
   }
 
-  const { payload } = await jwtVerify(token, resolverFn, {
-    issuer: config.oidcEndpoint,
-  });
+  // Try to fetch and store remote JWKS if callback is provided
+  if (config.storeLocalJwkSetFn) {
+    try {
+      const response = await fetch(config.jwkEndpoint);
+      if (response.ok) {
+        const remoteJwks = (await response.json()) as JSONWebKeySet;
+        await config.storeLocalJwkSetFn(remoteJwks);
+        return getVerifiedPayload(createLocalJWKSet(remoteJwks));
+      }
+    } catch {
+      // Fall through to remote resolver
+    }
+  }
 
-  return payload;
+  // Fall back to remote resolver
+  return getVerifiedPayload(createRemoteJWKSet(new URL(config.jwkEndpoint)));
 };
 
 export const ensureUserCanAccessUser = (
